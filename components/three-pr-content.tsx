@@ -200,6 +200,97 @@ git branch -d feature/ACA-123-login-auth`,
         />
       </section>
 
+      <section id="squash-variant" ref={setRef('squash-variant')} className="scroll-mt-24 mt-16">
+        <h2 className="text-3xl font-bold text-foreground mb-6">Variante con Squash y Branches Limpias</h2>
+
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          Si quieres mantener un historial limpio y evitar conflictos, puedes preparar una rama intermedia
+          que consolide los commits antes de abrir los 3 PRs. El objetivo es que la rama que usa el prefijo
+          <code className="text-foreground"> feature/</code> tenga un único commit con todo el trabajo.
+        </p>
+
+        <GitDiagram
+          commits={[
+            { id: 'm0', branch: 'main', x: 80, y: 50, message: 'main' },
+            { id: 'w1', branch: 'work/feature-x', x: 200, y: 110, message: '7 commits' },
+            { id: 'w2', branch: 'work/feature-x', x: 320, y: 110, message: '...' },
+            { id: 'f1', branch: 'feature/feature-x', x: 440, y: 50, message: 'squash', type: 'squash' },
+          ]}
+          branches={[
+            { name: 'main', color: '#ff0080', y: 50 },
+            { name: 'work/feature-x', color: '#a855f7', y: 110 },
+            { name: 'feature/feature-x', color: '#0070f3', y: 50 },
+          ]}
+          connections={[
+            { from: 'm0', to: 'w1' },
+            { from: 'w1', to: 'w2' },
+            { from: 'm0', to: 'f1' },
+            { from: 'w2', to: 'f1', type: 'merge' },
+          ]}
+          height={200}
+        />
+
+        <div className="bg-card border border-border rounded-lg p-6 my-6">
+          <h4 className="text-sm font-semibold text-foreground mb-3">Flujo recomendado</h4>
+          <ol className="space-y-3 text-sm text-muted-foreground">
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">1.</span>
+              <span>Crear la rama de trabajo desde <code className="text-foreground">main</code> y desarrollar ahí (ej. 7 commits).</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">2.</span>
+              <span>Crear una rama limpia desde <code className="text-foreground">main</code> y hacer un PR desde la rama de trabajo.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">3.</span>
+              <span>Hacer squash al mergear ese PR para dejar un solo commit.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">4.</span>
+              <span>Usar la rama limpia como <code className="text-foreground">feature/</code> para generar automáticamente los 3 PRs.</span>
+            </li>
+          </ol>
+        </div>
+
+        <div className="grid gap-4">
+          <div className="bg-muted/30 border border-border rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-foreground mb-3">Naming sugerido</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <code className="text-foreground">work/feature-x</code> → rama de trabajo con múltiples commits
+              </li>
+              <li>
+                <code className="text-foreground">feature/feature-x</code> → rama limpia con un solo commit
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-foreground mb-3">Comandos ejemplo</h4>
+            <pre className="bg-background border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto">
+              <code className="text-foreground">{`# 1) Rama de trabajo (varios commits)
+git checkout main
+git pull origin main
+git checkout -b work/feature-x
+
+# ...hacer commits...
+git push -u origin work/feature-x
+
+# 2) Rama limpia desde main
+git checkout main
+git checkout -b feature/feature-x
+git push -u origin feature/feature-x
+
+# 3) PR: work/feature-x -> feature/feature-x (merge squash)
+# Resultado: feature/feature-x tiene 1 commit
+
+# 4) Push final
+git push origin feature/feature-x`}</code>
+            </pre>
+          </div>
+        </div>
+      </section>
+
       <section id="github-actions" ref={setRef('github-actions')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">GitHub Actions</h2>
 

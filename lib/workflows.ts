@@ -51,6 +51,10 @@ export const workflows = [
         title: 'Paso a Paso',
       },
       {
+        id: 'squash-variant',
+        title: 'Variante con Squash',
+      },
+      {
         id: 'github-actions',
         title: 'GitHub Actions',
       },

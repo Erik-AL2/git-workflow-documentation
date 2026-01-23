@@ -21,7 +21,16 @@
   --success: #0dde6a;
   --error: #ff0080;
   --purple: #a855f7;
+  --orange: #fb923c;
   --destructive: #ff0080;
+
+  /* Git branch colors */
+  --branch-main: #ff0080;
+  --branch-feature: #0dde6a;
+  --branch-dev: #0070f3;
+  --branch-stg: #fb923c;
+  --branch-integration: #0070f3;
+  --branch-work: #a855f7;
   --destructive-foreground: #ffffff;
   --border: #333333;
   --input: #1a1a1a;
@@ -55,7 +64,16 @@
   --success: #0dde6a;
   --error: #ff0080;
   --purple: #a855f7;
+  --orange: #fb923c;
   --destructive: #ff0080;
+
+  /* Git branch colors */
+  --branch-main: #ff0080;
+  --branch-feature: #0dde6a;
+  --branch-dev: #0070f3;
+  --branch-stg: #fb923c;
+  --branch-integration: #0070f3;
+  --branch-work: #a855f7;
   --destructive-foreground: #ffffff;
   --border: #333333;
   --input: #1a1a1a;
@@ -90,7 +108,16 @@
   --color-success: var(--success);
   --color-error: var(--error);
   --color-purple: var(--purple);
+  --color-orange: var(--orange);
   --color-destructive: var(--destructive);
+
+  /* Git branch colors */
+  --color-branch-main: var(--branch-main);
+  --color-branch-feature: var(--branch-feature);
+  --color-branch-dev: var(--branch-dev);
+  --color-branch-stg: var(--branch-stg);
+  --color-branch-integration: var(--branch-integration);
+  --color-branch-work: var(--branch-work);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);

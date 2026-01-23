@@ -6,6 +6,7 @@ import { ThreePRDiagram } from '@/components/three-pr-diagram';
 import { ThreePRFlowDiagram } from '@/components/three-pr-flow-diagram';
 import { ProcessTimeline } from '@/components/process-timeline';
 import { GitHubActionsSection } from '@/components/github-actions-section';
+import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
 import { GitBranch, GitPullRequest, Check, X, CheckSquare, Square, AlertTriangle } from 'lucide-react';
 import {
   Accordion,
@@ -200,6 +201,99 @@ git branch -d feature/ACA-123-login-auth`,
         />
       </section>
 
+      <section id="squash-variant" ref={setRef('squash-variant')} className="scroll-mt-24 mt-16">
+        <h2 className="text-3xl font-bold text-foreground mb-6">Variante con Squash y Branches Limpias</h2>
+
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          Si quieres mantener un historial limpio y evitar conflictos, puedes preparar una rama intermedia
+          que consolide los commits antes de abrir los 3 PRs. El objetivo es que la rama que usa el prefijo
+          <code className="text-foreground"> feature/</code> tenga un único commit con todo el trabajo.
+        </p>
+
+        <GitDiagram
+          commits={[
+            { id: 'm0', branch: 'main', x: 100, y: 40, message: 'main' },
+            { id: 'w1', branch: 'work/feature-x', x: 250, y: 160, message: 'commit 1' },
+            { id: 'w2', branch: 'work/feature-x', x: 350, y: 160, message: 'commit 2' },
+            { id: 'w3', branch: 'work/feature-x', x: 450, y: 160, message: '...7 commits' },
+            { id: 'f1', branch: 'feature/feature-x', x: 600, y: 100, message: 'squash merge', type: 'squash' },
+          ]}
+          branches={[
+            { name: 'main', color: BRANCH_COLORS_HEX.main, y: 40 },
+            { name: 'work/feature-x', color: BRANCH_COLORS_HEX.work, y: 160 },
+            { name: 'feature/feature-x', color: BRANCH_COLORS_HEX.feature, y: 100 },
+          ]}
+          connections={[
+            { from: 'm0', to: 'w1' },
+            { from: 'w1', to: 'w2' },
+            { from: 'w2', to: 'w3' },
+            { from: 'm0', to: 'f1' },
+            { from: 'w3', to: 'f1', type: 'merge' },
+          ]}
+          height={240}
+        />
+
+        <div className="bg-card border border-border rounded-lg p-6 my-6">
+          <h4 className="text-sm font-semibold text-foreground mb-3">Flujo recomendado</h4>
+          <ol className="space-y-3 text-sm text-muted-foreground">
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">1.</span>
+              <span>Crear la rama de trabajo desde <code className="text-foreground">main</code> y desarrollar ahí (ej. 7 commits).</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">2.</span>
+              <span>Crear una rama limpia desde <code className="text-foreground">main</code> y hacer un PR desde la rama de trabajo.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">3.</span>
+              <span>Hacer squash al mergear ese PR para dejar un solo commit.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-primary font-semibold">4.</span>
+              <span>Usar la rama limpia como <code className="text-foreground">feature/</code> para generar automáticamente los 3 PRs.</span>
+            </li>
+          </ol>
+        </div>
+
+        <div className="grid gap-4">
+          <div className="bg-muted/30 border border-border rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-foreground mb-3">Naming sugerido</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <code className="text-foreground">work/feature-x</code> → rama de trabajo con múltiples commits
+              </li>
+              <li>
+                <code className="text-foreground">feature/feature-x</code> → rama limpia con un solo commit
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-foreground mb-3">Comandos ejemplo</h4>
+            <pre className="bg-background border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto">
+              <code className="text-foreground">{`# 1) Rama de trabajo (varios commits)
+git checkout main
+git pull origin main
+git checkout -b work/feature-x
+
+# ...hacer commits...
+git push -u origin work/feature-x
+
+# 2) Rama limpia desde main
+git checkout main
+git checkout -b feature/feature-x
+git push -u origin feature/feature-x
+
+# 3) PR: work/feature-x -> feature/feature-x (merge squash)
+# Resultado: feature/feature-x tiene 1 commit
+
+# 4) Push final
+git push origin feature/feature-x`}</code>
+            </pre>
+          </div>
+        </div>
+      </section>
+
       <section id="github-actions" ref={setRef('github-actions')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">GitHub Actions</h2>
 
@@ -213,74 +307,84 @@ git branch -d feature/ACA-123-login-auth`,
       <section id="reglas" ref={setRef('reglas')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">Reglas Importantes</h2>
 
-        <p className="text-muted-foreground leading-relaxed mb-8">
-          5 reglas críticas para que el workflow funcione correctamente.
-        </p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* DO's */}
-          <div className="border rounded-lg p-6 bg-success/5">
-            <h4 className="text-lg font-semibold text-success mb-4 flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              QUÉ HACER
-            </h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Siempre MERGE commit (nunca squash)</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Preserva historial y sincronización</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Usar --force-with-lease</p>
-                  <code className="text-xs bg-card px-2 py-0.5 rounded font-mono">git push --force-with-lease</code>
-                </div>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <p className="font-medium text-foreground">Resolver conflictos en tu feature branch</p>
-              </li>
-            </ul>
+        <div className="grid gap-3 mb-6">
+          {/* Crear desde main */}
+          <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Check className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-foreground mb-1">Crear features desde main</h4>
+              <p className="text-xs text-muted-foreground">
+                Cada feature debe basarse en código estable de producción, no en dev/stg que contienen cambios inestables.
+              </p>
+            </div>
           </div>
 
-          {/* DON'Ts */}
-          <div className="border rounded-lg p-6 bg-error/5">
-            <h4 className="text-lg font-semibold text-error mb-4 flex items-center gap-2">
-              <X className="w-5 h-5" />
-              QUÉ NO HACER
-            </h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2">
-                <X className="w-4 h-4 text-error mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">NO crear features desde dev/stg</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Basarás tu código en cambios inestables</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-2">
-                <X className="w-4 h-4 text-error mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">NO mergear entre ambientes</p>
-                  <code className="text-xs bg-card px-2 py-0.5 rounded font-mono">git merge stg</code>
-                  <span className="text-xs text-muted-foreground ml-1">← Nunca</span>
-                </div>
-              </li>
-            </ul>
+          {/* MERGE commit */}
+          <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Check className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-foreground mb-1">Usar MERGE commit en los 3 PRs</h4>
+              <p className="text-xs text-muted-foreground">
+                Preserva commit hashes idénticos en dev/stg/main. Squash solo en la variante especial (ver arriba).
+              </p>
+            </div>
+          </div>
+
+          {/* Force with lease */}
+          <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Check className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-foreground mb-1">Usar --force-with-lease para rebases</h4>
+              <code className="text-xs bg-muted px-2 py-1 rounded font-mono text-foreground">
+                git push --force-with-lease
+              </code>
+              <p className="text-xs text-muted-foreground mt-1">Más seguro que --force, detecta cambios remotos.</p>
+            </div>
+          </div>
+
+          {/* NO mergear entre ambientes */}
+          <div className="flex items-start gap-4 p-4 rounded-lg border border-error/30 bg-error/5">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-error/10 flex items-center justify-center">
+              <X className="w-4 h-4 text-error" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-foreground mb-1">NO mergear entre ambientes</h4>
+              <p className="text-xs text-muted-foreground">
+                Evitar <code className="text-error font-mono">git merge dev</code> o{' '}
+                <code className="text-error font-mono">git merge stg</code> desde tu feature.
+              </p>
+            </div>
+          </div>
+
+          {/* NO crear desde dev/stg */}
+          <div className="flex items-start gap-4 p-4 rounded-lg border border-error/30 bg-error/5">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-error/10 flex items-center justify-center">
+              <X className="w-4 h-4 text-error" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-foreground mb-1">NO crear branch desde dev/stg</h4>
+              <p className="text-xs text-muted-foreground">
+                Tu feature incluiría código de otras features que pueden no llegar a producción.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Critical rule highlight */}
-        <div className="mt-6 border-l-4 border-warning rounded-r-lg bg-warning/5 p-4">
+        {/* Key principle */}
+        <div className="border border-primary/30 rounded-lg bg-primary/5 p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground mb-1">Regla de Oro</p>
+              <p className="text-sm font-semibold text-foreground mb-1">Principio clave</p>
               <p className="text-sm text-muted-foreground">
-                <strong>Nunca</strong> uses SQUASH merge. Siempre MERGE commit. Esto mantiene los mismos
-                commit hashes en dev/stg/main y evita divergencias.
+                Los mismos commits deben existir en dev, stg y main para mantener sincronización.
+                Por eso usamos MERGE (no SQUASH) en el flujo normal.
               </p>
             </div>
           </div>

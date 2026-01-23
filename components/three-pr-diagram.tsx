@@ -82,18 +82,18 @@ export function ThreePRDiagram() {
             <div className="text-xs font-semibold text-muted-foreground">main</div>
           </div>
           <ArrowRight className="w-5 h-5 text-muted-foreground" />
-          <div className="px-4 py-2 rounded-lg border-2 border-purple bg-purple/10">
-            <div className="text-xs font-semibold text-purple">feature</div>
+          <div className="px-4 py-2 rounded-lg border-2 border-success bg-success/10">
+            <div className="text-xs font-semibold text-success">feature</div>
           </div>
         </div>
 
         {/* Visual branching indicator */}
         <div className="flex flex-col items-center -my-3">
-          <div className="w-px h-8 bg-purple/50" />
+          <div className="w-px h-8 bg-success/50" />
           <div className="flex items-center gap-2">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent via-purple/50 to-transparent" />
-            <GitBranch className="w-4 h-4 text-purple rotate-90" />
-            <div className="h-px w-16 bg-gradient-to-r from-transparent via-purple/50 to-transparent" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-success/50 to-transparent" />
+            <GitBranch className="w-4 h-4 text-success rotate-90" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-success/50 to-transparent" />
           </div>
         </div>
 
@@ -103,7 +103,7 @@ export function ThreePRDiagram() {
             <div className="flex flex-col items-center gap-1">
               <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #1</div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-purple">feature</span>
+                <span className="text-xs font-semibold text-success">feature</span>
                 <ArrowRight className="w-3 h-3 text-primary" />
                 <span className="text-xs font-semibold text-primary">dev</span>
               </div>
@@ -116,7 +116,7 @@ export function ThreePRDiagram() {
             <div className="flex flex-col items-center gap-1">
               <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #2</div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-purple">feature</span>
+                <span className="text-xs font-semibold text-success">feature</span>
                 <ArrowRight className="w-3 h-3 text-orange-500" />
                 <span className="text-xs font-semibold text-orange-500">stg</span>
               </div>
@@ -129,7 +129,7 @@ export function ThreePRDiagram() {
             <div className="flex flex-col items-center gap-1">
               <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #3</div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-purple">feature</span>
+                <span className="text-xs font-semibold text-success">feature</span>
                 <ArrowRight className="w-3 h-3 text-success" />
                 <span className="text-xs font-semibold text-success">main</span>
               </div>

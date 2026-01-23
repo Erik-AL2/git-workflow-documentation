@@ -1,6 +1,7 @@
 'use client';
 
 import { GitDiagram } from '@/components/git-diagram';
+import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
 
 export function ThreePRFlowDiagram() {
   return (
@@ -27,10 +28,10 @@ export function ThreePRFlowDiagram() {
           { id: 's2', branch: 'stg', x: 550, y: 100, message: 'PR #2 merged', type: 'merge' },
         ]}
         branches={[
-          { name: 'dev', color: '#0070f3', y: 50 },
-          { name: 'stg', color: '#a855f7', y: 100 },
-          { name: 'feature', color: '#0dde6a', y: 150 },
-          { name: 'main', color: '#ff0080', y: 250 },
+          { name: 'dev', color: BRANCH_COLORS_HEX.dev, y: 50 },
+          { name: 'stg', color: BRANCH_COLORS_HEX.stg, y: 100 },
+          { name: 'feature', color: BRANCH_COLORS_HEX.feature, y: 150 },
+          { name: 'main', color: BRANCH_COLORS_HEX.main, y: 250 },
         ]}
         connections={[
           // Feature creation from main
@@ -63,8 +64,8 @@ export function ThreePRFlowDiagram() {
           </div>
         </div>
 
-        <div className="p-4 rounded-lg border border-purple/40 bg-purple/5">
-          <div className="text-xs font-semibold text-purple mb-1">PR #2</div>
+        <div className="p-4 rounded-lg border border-orange-500/40 bg-orange-500/5">
+          <div className="text-xs font-semibold text-orange-500 mb-1">PR #2</div>
           <div className="text-sm font-bold text-foreground">feature → stg</div>
           <div className="text-xs text-muted-foreground mt-1">
             Merge cuando QA aprueba

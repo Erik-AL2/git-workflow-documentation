@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { GitDiagram } from '@/components/git-diagram';
 import { ThreePRDiagram } from '@/components/three-pr-diagram';
+import { ThreePRFlowDiagram } from '@/components/three-pr-flow-diagram';
+import { ProcessTimeline } from '@/components/process-timeline';
+import { GitHubActionsSection } from '@/components/github-actions-section';
 import { GitBranch, GitPullRequest, Check, X, CheckSquare, Square, AlertTriangle } from 'lucide-react';
 import {
   Accordion,
@@ -49,573 +52,237 @@ export function ThreePRContent({ onSectionChange }: ThreePRContentProps) {
   return (
     <div className="prose prose-dark max-w-none">
       <section id="overview" ref={setRef('overview')} className="scroll-mt-24">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Overview</h2>
-        
-        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">¿Por Qué Este Workflow?</h3>
-        <p className="text-muted-foreground leading-relaxed">
-          En equipos grandes trabajando en el mismo repositorio, el flujo tradicional (dev → stg → main) 
-          puede generar bloqueos. Este workflow permite que cada feature avance independientemente mediante 
-          3 PRs separados, eliminando los bloqueos entre features.
+        <h2 className="text-3xl font-bold text-foreground mb-6">Overview</h2>
+
+        <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+          En equipos grandes, el flujo tradicional (dev → stg → main) genera bloqueos. Este workflow permite
+          que <strong className="text-foreground">cada feature avance independientemente</strong> mediante 3 PRs separados.
         </p>
 
-        <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border border-error/40 rounded-lg p-6 bg-error/5">
-            <h4 className="text-sm font-semibold text-error mb-3 flex items-center gap-2">
-              <X className="w-4 h-4" />
-              Problema Tradicional
-            </h4>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Dev contiene:</p>
-              <ul className="list-none space-y-1 ml-2">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  Feature A (lista, testeada)
-                </li>
-                <li className="flex items-center gap-2">
-                  <X className="w-3 h-3 text-error" />
-                  Feature B (con bugs críticos)
-                </li>
-              </ul>
-              <p className="pt-2 text-error">Resultado: Feature B bloquea el deploy de Feature A</p>
+        {/* Problem vs Solution */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="border-l-4 border-error rounded-r-lg bg-error/5 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <X className="w-4 h-4 text-error" />
+              <h4 className="text-sm font-semibold text-error">Problema Tradicional</h4>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Feature B con bugs bloquea el deploy de Feature A que ya está lista.
+              Todo o nada.
+            </p>
           </div>
 
-          <div className="border border-success/40 rounded-lg p-6 bg-success/5">
-            <h4 className="text-sm font-semibold text-success mb-3 flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Solución
-            </h4>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p className="font-medium">Cada feature avanza con 3 PRs independientes:</p>
-              <ul className="list-none space-y-1 ml-2 text-xs">
-                <li>Feature A: 3 PRs (dev ✓, stg ✓, main ✓)</li>
-                <li>Feature B: 3 PRs (dev ✓, stg ⏳, main ⏳)</li>
-                <li>Feature C: 3 PRs (dev ✓, stg ✓, main ⏳)</li>
-              </ul>
-              <p className="text-xs pt-2">Cada PR se mergea cuando cumple sus requisitos específicos</p>
+          <div className="border-l-4 border-success rounded-r-lg bg-success/5 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Check className="w-4 h-4 text-success" />
+              <h4 className="text-sm font-semibold text-success">Solución: 3 PRs</h4>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Cada feature progresa a su propio ritmo. Feature A puede deployarse mientras
+              Feature B se queda en staging.
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-          <div>
-            <h4 className="text-sm font-semibold text-success mb-3">Ventajas</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
-                <span>Sin bloqueos entre features - Cada una avanza a su ritmo</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
-                <span>Deploy selectivo - Solo lo que está listo llega a producción</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
-                <span>Flexibilidad para equipos - QA puede aprobar features independientemente</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
-                <span>Mejor control - Claridad sobre qué está en cada ambiente</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-semibold text-muted-foreground mb-3">Trade-offs</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-error mt-0.5" />
-                <span>Más PRs por feature - 3 en vez de 1</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-error mt-0.5" />
-                <span>Sincronización manual - Requiere disciplina</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-error mt-0.5" />
-                <span>Más complejo - Curva de aprendizaje</span>
-              </li>
-            </ul>
+        {/* Quick benefits */}
+        <div className="border rounded-lg p-5 bg-muted/30">
+          <h4 className="text-sm font-semibold text-foreground mb-3">Beneficios Clave</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Check className="w-3.5 h-3.5 text-success flex-shrink-0" />
+              <span className="text-muted-foreground">Sin bloqueos entre features</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-3.5 h-3.5 text-success flex-shrink-0" />
+              <span className="text-muted-foreground">Deploy selectivo</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-3.5 h-3.5 text-success flex-shrink-0" />
+              <span className="text-muted-foreground">Flexibilidad de QA</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-warning flex-shrink-0" />
+              <span className="text-muted-foreground">Trade-off: 3 PRs por feature</span>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="flujo-visual" ref={setRef('flujo-visual')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Flujo Visual</h2>
-        
-        <p className="text-muted-foreground leading-relaxed mb-6">
-          Una feature branch se crea desde main y abre <strong>3 PRs independientes simultáneos</strong> 
-          (uno a cada ambiente). Cada PR se mergea cuando cumple sus requisitos específicos, sin depender 
+        <h2 className="text-3xl font-bold text-foreground mb-6">Cómo Funciona</h2>
+
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          Una feature branch se crea desde main y abre <strong>3 PRs independientes simultáneos</strong>
+          (uno a cada ambiente). Cada PR se mergea cuando cumple sus requisitos específicos, sin depender
           de los demás.
         </p>
 
+        {/* Diagrama principal */}
         <ThreePRDiagram />
 
-        <div className="mt-8 bg-card border border-border rounded-lg p-6">
-          <h4 className="text-sm font-semibold text-foreground mb-4">Descripción del Flujo</h4>
-          <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-            <li><strong>Crear Feature</strong> - Desde main (siempre)</li>
-            <li><strong>3 PRs Automáticos</strong> - Se crean al hacer push</li>
-            <li><strong>Merge Secuencial</strong> - Cada PR cuando cumple requisitos</li>
-          </ol>
+        {/* Diagrama de flujo Git */}
+        <div className="mt-12 mb-8">
+          <h3 className="text-xl font-semibold text-foreground mb-4">Flujo de Git</h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            Visualización de cómo los commits fluyen desde la feature branch hacia cada ambiente.
+          </p>
+          <ThreePRFlowDiagram />
         </div>
       </section>
 
       <section id="proceso-detallado" ref={setRef('proceso-detallado')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Proceso Detallado</h2>
+        <h2 className="text-3xl font-bold text-foreground mb-6">Paso a Paso</h2>
 
-        {/* Paso 1 */}
-        <div className="mt-8">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 1: Crear Feature Branch</h3>
-          
-          <p className="text-muted-foreground leading-relaxed mb-4">
-            Siempre crea tu feature desde <code className="text-primary bg-primary/10 px-2 py-1 rounded">main</code>.
-            Esto garantiza que tu feature esté basada en código estable de producción.
-          </p>
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          El workflow completo desde crear la feature hasta deployar a producción.
+        </p>
 
-          <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto my-6">
-            <code className="text-foreground">{`# Siempre desde main
+        {/* Timeline de pasos - Solo pasos técnicos, no detalles de PRs */}
+        <ProcessTimeline
+          steps={[
+            {
+              number: 1,
+              title: 'Crear Feature Branch',
+              subtitle: 'Siempre desde main para código estable',
+              code: `# Siempre desde main
 git checkout main
 git pull origin main
-git checkout -b feature/backend-auth-login-API-123
-git push -u origin feature/backend-auth-login-API-123`}</code>
-          </pre>
-
-          <div className="bg-success/5 border border-success/20 rounded-lg p-6 my-6">
-            <h4 className="text-sm font-semibold text-success mb-3">✅ Automáticamente se crean 3 PRs:</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <GitPullRequest className="w-4 h-4 text-primary" />
-                <code className="text-primary bg-primary/10 px-2 py-0.5 rounded">[DEV]</code> 
-                <span>feature → dev</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <GitPullRequest className="w-4 h-4 text-purple" />
-                <code className="text-purple bg-purple/10 px-2 py-0.5 rounded">[STG]</code> 
-                <span>feature → stg (draft)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <GitPullRequest className="w-4 h-4 text-error" />
-                <code className="text-error bg-error/10 px-2 py-0.5 rounded">[PROD]</code> 
-                <span>feature → main (draft)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Paso 2 */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 2: Desarrollo</h3>
-          
-          <p className="text-muted-foreground leading-relaxed mb-4">
-            Durante el desarrollo, trabaja normalmente en tu feature branch. Sincroniza con main diariamente 
-            para evitar conflictos masivos.
-          </p>
-
-          <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto my-6">
-            <code className="text-foreground">{`# Trabajo diario
+git checkout -b feature/ACA-123-login-auth
+git push -u origin feature/ACA-123-login-auth`,
+              note: {
+                type: 'success',
+                message: '<strong>✅ Automáticamente se crean 3 PRs:</strong> [DEV] feature → dev • [STG] feature → stg (draft) • [PROD] feature → main (draft)',
+              },
+            },
+            {
+              number: 2,
+              title: 'Desarrollo y Testing',
+              subtitle: 'Trabaja, commitea y sincroniza diariamente',
+              code: `# Trabajo diario
 git add .
 git commit -m "feat(auth): add JWT validation"
-git push origin feature/backend-auth-login-API-123
+git push
 
-# Sincronizar con main (diariamente)
+# Sincronizar con main (IMPORTANTE: hacer diariamente)
 git fetch origin
 git rebase origin/main
-git push --force-with-lease origin feature/backend-auth-login-API-123`}</code>
-          </pre>
-
-          <div className="bg-error/5 border border-error/20 rounded-lg p-4 my-6">
-            <p className="text-sm text-foreground flex items-start gap-2">
-              <AlertTriangle className="w-5 h-5 text-error mt-0.5 flex-shrink-0" />
-              <span><strong>Importante:</strong> Sincroniza con main diariamente para evitar conflictos masivos.</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Paso 3 */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 3: PR #1 - Development</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Cuándo</h4>
-              <p className="text-sm text-muted-foreground">Cuando la feature funciona localmente</p>
-            </div>
-            
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Requisitos</h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  CI/CD pasa (lint + typecheck + build)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  Tests automáticos OK
-                </li>
-                <li className="flex items-center gap-2">
-                  <AlertTriangle className="w-3 h-3 text-muted-foreground" />
-                  Code review opcional
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 my-6">
-            <h4 className="text-sm font-semibold text-foreground mb-2">Acción</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-              <li>El PR se actualiza automáticamente con cada push</li>
-              <li>Verificar que CI pase</li>
-              <li>Mergear (sin esperar approval)</li>
-              <li><strong>Método:</strong> MERGE commit</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Paso 4 */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 4: PR #2 - Staging</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Cuándo</h4>
-              <p className="text-sm text-muted-foreground">Después de mergear a dev</p>
-            </div>
-            
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Requisitos</h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  PR a dev mergeado
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  Testing en dev OK
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  1 approval requerida
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  QA sign-off
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 my-6">
-            <h4 className="text-sm font-semibold text-foreground mb-2">Acción</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-              <li>Cambiar PR de draft a ready for review</li>
-              <li>QA testea en ambiente stg</li>
-              <li>Si falla: fix en feature branch, push (PR se actualiza)</li>
-              <li>Si pasa: QA aprueba y mergeas</li>
-              <li><strong>Método:</strong> MERGE commit</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Paso 5 */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 5: PR #3 - Production</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Cuándo</h4>
-              <p className="text-sm text-muted-foreground">Después de mergear a stg</p>
-            </div>
-            
-            <div className="border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Requisitos</h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  PR a stg mergeado
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  QA aprobado en stg
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  2+ approvals (tech leads)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-success" />
-                  Todos los tests pasando
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 my-6">
-            <h4 className="text-sm font-semibold text-foreground mb-2">Acción</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-              <li>Cambiar PR de draft a ready for review</li>
-              <li>Solicitar approvals de tech leads</li>
-              <li>Verificar que todo está OK</li>
-              <li>Mergear → deploy automático a producción</li>
-              <li><strong>Método:</strong> MERGE commit</li>
-            </ul>
-          </div>
-
-          <div className="bg-success/5 border border-success/20 rounded-lg p-4 my-6">
-            <p className="text-sm text-success flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              <span><strong>Mergear → deploy automático a producción</strong></span>
-            </p>
-          </div>
-        </div>
-
-        {/* Paso 6 */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-foreground mb-4">Paso 6: Cleanup</h3>
-          
-          <p className="text-muted-foreground leading-relaxed mb-4">
-            El branch se elimina automáticamente después del merge a main.
-          </p>
-
-          <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto my-6">
-            <code className="text-foreground">{`# Automático: el branch se elimina después del merge a main
-# Verificar que fue eliminado:
+git push --force-with-lease`,
+              note: {
+                type: 'warning',
+                message: '<strong>⚠️ Sincronización Diaria:</strong> Evita conflictos masivos. Hazlo cada mañana antes de empezar.',
+              },
+            },
+            {
+              number: 3,
+              title: 'Merge PRs Secuencialmente',
+              subtitle: 'Cada PR cuando cumple sus requisitos (ver diagrama arriba)',
+              actions: [
+                '<strong>PR #1 (dev):</strong> Mergear cuando CI pasa',
+                '<strong>PR #2 (stg):</strong> Cambiar a ready, esperar QA approval, mergear',
+                '<strong>PR #3 (main):</strong> Solicitar 2+ approvals, mergear → deploy automático',
+                '<em>Importante: Siempre usar <strong>MERGE commit</strong>, nunca SQUASH</em>',
+              ],
+              note: {
+                type: 'info',
+                message: 'Ver detalles de cada PR y sus requisitos específicos en la sección <strong>"Cómo Funciona"</strong> arriba.',
+              },
+            },
+            {
+              number: 4,
+              title: 'Cleanup Automático',
+              subtitle: 'El branch se elimina después del merge a main',
+              code: `# Automático: se elimina al mergear PR #3
+# Verificar eliminación local:
 git fetch --prune
-git branch -a | grep feature/backend-auth-login`}</code>
-          </pre>
-        </div>
+git branch -d feature/ACA-123-login-auth`,
+            },
+          ]}
+        />
       </section>
 
       <section id="github-actions" ref={setRef('github-actions')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">GitHub Actions</h2>
-        
-        <p className="text-muted-foreground leading-relaxed mb-6">
+
+        <p className="text-muted-foreground leading-relaxed mb-8">
           Tenemos 2 workflows automatizados que facilitan el proceso.
         </p>
 
-        <div className="space-y-8">
-          {/* Workflow 1 */}
-          <div className="border border-primary/40 rounded-lg p-6 bg-primary/5">
-            <h3 className="text-xl font-semibold text-foreground mb-4">1. Auto-crear PRs</h3>
-            
-            <p className="text-sm text-muted-foreground mb-4">
-              Cuando haces push de un branch que sigue nuestra convención, automáticamente se ejecuta:
-            </p>
-
-            <div className="bg-card border border-border rounded-lg p-4 mb-4">
-              <p className="text-xs font-mono text-muted-foreground">
-                <strong>Workflow:</strong> .github/workflows/auto-create-prs.yml
-              </p>
-            </div>
-
-            <h4 className="text-sm font-semibold text-foreground mb-3">Qué hace:</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside mb-4">
-              <li>Detecta branches con prefijos: feature/, fix/, hotfix/, refactor/, docs/</li>
-              <li>Crea/verifica labels automáticos</li>
-              <li>Crea 3 PRs automáticamente</li>
-            </ul>
-
-            <div className="bg-muted/50 border border-border rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Convención de Nomenclatura:</h4>
-              <pre className="bg-card border border-border rounded p-3 text-xs font-mono overflow-x-auto">
-                <code className="text-foreground">{`# Formato recomendado:
-<tipo>/<JIRA-TICKET>-descripcion-corta
-
-# Ejemplos correctos:
-feature/ACA-123-login-authentication
-fix/ACA-456-header-responsive
-hotfix/ACA-789-payment-critical-bug
-refactor/ACA-234-auth-service
-docs/ACA-567-api-documentation
-
-# ❌ Ejemplos incorrectos (sin ticket):
-feature/login
-fix/bug-header`}</code>
-              </pre>
-
-              <div className="mt-4">
-                <p className="text-xs text-muted-foreground mb-2"><strong>¿Por qué incluir el ticket de JIRA?</strong></p>
-                <ul className="space-y-1 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3 h-3 text-success" />
-                    Trazabilidad automática entre código y tareas
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3 h-3 text-success" />
-                    Fácil identificar qué PRs pertenecen a qué historia
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3 h-3 text-success" />
-                    Reporting y métricas más precisas
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3 h-3 text-success" />
-                    Code review más contextual
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Workflow 2 */}
-          <div className="border border-primary/40 rounded-lg p-6 bg-primary/5">
-            <h3 className="text-xl font-semibold text-foreground mb-4">2. CI/CD - Validación Automática</h3>
-            
-            <p className="text-sm text-muted-foreground mb-4">
-              Cuando abres o actualizas un PR a dev, stg o main, automáticamente se ejecuta:
-            </p>
-
-            <div className="bg-card border border-border rounded-lg p-4 mb-4">
-              <p className="text-xs font-mono text-muted-foreground">
-                <strong>Workflow:</strong> .github/workflows/ci.yml
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Si algo falla:</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <X className="w-4 h-4 text-error" />
-                    PR queda bloqueado
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-error" />
-                    No se puede mergear hasta corregir
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-4 h-4 flex items-center justify-center text-error">🔴</span>
-                    Status check muestra error en rojo
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Si todo pasa:</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-success" />
-                    PR puede mergearse
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-4 h-4 flex items-center justify-center text-success">🟢</span>
-                    Status check muestra success en verde
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+        <GitHubActionsSection />
       </section>
 
       <section id="reglas" ref={setRef('reglas')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">Reglas Importantes</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-6">
-          <div className="border border-success/40 rounded-lg p-6 bg-success/5">
+
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          5 reglas críticas para que el workflow funcione correctamente.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* DO's */}
+          <div className="border rounded-lg p-6 bg-success/5">
             <h4 className="text-lg font-semibold text-success mb-4 flex items-center gap-2">
               <Check className="w-5 h-5" />
               QUÉ HACER
             </h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-start gap-3">
-                <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">Crear features desde main</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-                    git checkout main  # ✅
-                  </pre>
+                  <p className="font-medium text-foreground">Siempre MERGE commit (nunca squash)</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Preserva historial y sincronización</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">Sincronizar con main diariamente</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-{`git fetch origin
-git rebase origin/main`}
-                  </pre>
+                  <p className="font-medium text-foreground">Usar --force-with-lease</p>
+                  <code className="text-xs bg-card px-2 py-0.5 rounded font-mono">git push --force-with-lease</code>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Usar MERGE en todos los PRs</p>
-                  <p className="text-xs mt-1">Preserva historial completo</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Resolver conflictos en tu branch</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-{`git status
-git add .
-git rebase --continue`}
-                  </pre>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Mantener PRs actualizados</p>
-                  <p className="text-xs mt-1">Push frecuente - CI corre en cada push</p>
-                </div>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+                <p className="font-medium text-foreground">Resolver conflictos en tu feature branch</p>
               </li>
             </ul>
           </div>
 
-          <div className="border border-error/40 rounded-lg p-6 bg-error/5">
+          {/* DON'Ts */}
+          <div className="border rounded-lg p-6 bg-error/5">
             <h4 className="text-lg font-semibold text-error mb-4 flex items-center gap-2">
               <X className="w-5 h-5" />
               QUÉ NO HACER
             </h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-start gap-3">
-                <X className="w-4 h-4 text-error mt-1 flex-shrink-0" />
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-error mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">NO crear features desde dev o stg</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-                    git checkout dev   # ❌ NUNCA
-                  </pre>
-                  <p className="text-xs mt-1">Feature estará basada en código que puede no llegar a main</p>
+                  <p className="font-medium text-foreground">NO crear features desde dev/stg</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Basarás tu código en cambios inestables</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <X className="w-4 h-4 text-error mt-1 flex-shrink-0" />
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-error mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">NO usar SQUASH en los PRs</p>
-                  <p className="text-xs mt-1">Crea commits diferentes en cada branch, rompe la sincronización</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <X className="w-4 h-4 text-error mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">NO mergear manualmente entre dev/stg/main</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-{`git checkout dev
-git merge stg  # ❌ NUNCA`}
-                  </pre>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <X className="w-4 h-4 text-error mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">NO hacer force push sin --force-with-lease</p>
-                  <pre className="mt-1 text-xs bg-card border border-border rounded px-2 py-1 font-mono">
-{`git push -f  # ❌ PELIGROSO
-git push --force-with-lease  # ✅ SEGURO`}
-                  </pre>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <X className="w-4 h-4 text-error mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">NO commitear directamente a main/stg/dev</p>
-                  <p className="text-xs mt-1">Estas branches están protegidas, siempre vía PR</p>
+                  <p className="font-medium text-foreground">NO mergear entre ambientes</p>
+                  <code className="text-xs bg-card px-2 py-0.5 rounded font-mono">git merge stg</code>
+                  <span className="text-xs text-muted-foreground ml-1">← Nunca</span>
                 </div>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Critical rule highlight */}
+        <div className="mt-6 border-l-4 border-warning rounded-r-lg bg-warning/5 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-foreground mb-1">Regla de Oro</p>
+              <p className="text-sm text-muted-foreground">
+                <strong>Nunca</strong> uses SQUASH merge. Siempre MERGE commit. Esto mantiene los mismos
+                commit hashes en dev/stg/main y evita divergencias.
+              </p>
+            </div>
           </div>
         </div>
       </section>

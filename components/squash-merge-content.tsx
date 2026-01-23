@@ -37,26 +37,91 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
   return (
     <div className="prose prose-dark max-w-none">
       <section id="overview" ref={setRef('overview')} className="scroll-mt-24">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Overview</h2>
-        <p className="text-muted-foreground leading-relaxed">
-          This workflow is designed for sprint-based development with clean release cycles using squash merges.
-          It allows teams to maintain a clean commit history on the main branch while preserving detailed development
-          history on integration branches.
+        <h2 className="text-3xl font-bold text-foreground mb-6">Descripción General</h2>
+        <p className="text-muted-foreground leading-relaxed mb-8">
+          Este workflow está diseñado para desarrollo basado en sprints con ciclos de release limpios usando squash merges.
+          Mantiene un historial limpio en main mientras preserva el detalle completo en integration.
         </p>
+
+        {/* Branch Structure */}
+        <div className="space-y-4 mb-8">
+          <h3 className="text-xl font-semibold text-foreground">Estructura de Branches</h3>
+
+          <div className="grid gap-3">
+            {/* main */}
+            <div className="border-l-4 border-error rounded-r-lg bg-error/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <code className="text-sm font-bold text-error">main</code>
+                <span className="text-xs text-muted-foreground">— Código en producción</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Refleja exactamente lo que está corriendo en el ambiente de producción. Es la fuente de verdad para el estado actual.
+              </p>
+            </div>
+
+            {/* integration */}
+            <div className="border-l-4 border-primary rounded-r-lg bg-primary/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <code className="text-sm font-bold text-primary">integration</code>
+                <span className="text-xs text-muted-foreground">— Rama de integración del sprint</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Contiene todos los features del próximo release. Siempre deployable.{' '}
+                <strong className="text-foreground">No es un ambiente, es una rama de código.</strong>
+              </p>
+            </div>
+
+            {/* stg */}
+            <div className="border-l-4 border-orange-500 rounded-r-lg bg-orange-500/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <code className="text-sm font-bold text-orange-500">stg</code>
+                <span className="text-xs text-muted-foreground">— Ambiente de staging</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Ambiente de pruebas para QA y stakeholders. Una vez validado y aprobado, el feature se mergea a integration.
+              </p>
+            </div>
+
+            {/* dev */}
+            <div className="border-l-4 border-primary rounded-r-lg bg-primary/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <code className="text-sm font-bold text-primary">dev</code>
+                <span className="text-xs text-muted-foreground">— Ambiente de desarrollo</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Para testing de desarrolladores. Los features se prueban individualmente antes de promoción a staging.
+              </p>
+            </div>
+          </div>
+
+          {/* Key Principle */}
+          <div className="border border-primary/30 rounded-lg bg-primary/5 p-5 mt-6">
+            <div className="flex items-start gap-3">
+              <div className="w-1 h-full bg-primary rounded-full flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">💡 Principio Clave</h4>
+                <p className="text-sm text-muted-foreground">
+                  <code className="text-primary font-semibold">integration</code> debe estar siempre sincronizado con{' '}
+                  <code className="text-error font-semibold">main</code> o adelante de main. Nunca debe contener código que no pueda ir a producción.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="sprint-1" ref={setRef('sprint-1')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">Sprint 1</h2>
-        
-        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Feature Development</h3>
+
+        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Desarrollo de Features</h3>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          During Sprint 1, developers create feature branches from the integration branch and work independently.
-          Each feature goes through the standard PR process before being merged into integration.
+          Durante el Sprint 1, los desarrolladores crean ramas de features desde la rama de integración y trabajan independientemente.
+          Cada feature pasa por el proceso estándar de PR antes de ser mergeada a integración.
         </p>
 
         <GitDiagram
           commits={[
-            { id: 'i1', branch: 'integration', x: 100, y: 50, message: 'Start' },
+            { id: 'i1', branch: 'integration', x: 100, y: 50, message: 'Inicio' },
             { id: 'fa1', branch: 'feature/A', x: 200, y: 100, message: 'feat A.1' },
             { id: 'fa2', branch: 'feature/A', x: 300, y: 100, message: 'feat A.2' },
             { id: 'fa3', branch: 'feature/A', x: 400, y: 100, message: 'feat A.3' },
@@ -82,31 +147,116 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
         />
 
         <div className="bg-card border border-border rounded-lg p-6 my-6">
-          <h4 className="text-sm font-semibold text-foreground mb-3">State at End of Sprint 1</h4>
+          <h4 className="text-sm font-semibold text-foreground mb-3">Estado al Final del Sprint 1</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-success mt-0.5">✓</span>
-              <span>Integration contains 10 commits (6 from Feature A + 4 from Feature B)</span>
+              <span>Integration contiene 10 commits (6 de Feature A + 4 de Feature B)</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-muted-foreground mt-0.5">—</span>
-              <span>Main remains unchanged</span>
+              <span>Main permanece sin cambios</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-success mt-0.5">✓</span>
-              <span>All features are tested and approved</span>
+              <span>Todas las features están testeadas y aprobadas</span>
             </li>
           </ul>
+        </div>
+
+        {/* Workflow Steps */}
+        <div className="mt-12 space-y-6">
+          <h3 className="text-xl font-semibold text-foreground">Creación de Feature Branches</h3>
+          <p className="text-sm text-muted-foreground">
+            Todos los feature branches se crean desde <code className="text-primary font-semibold">integration</code>:
+          </p>
+
+          <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto">
+            <code className="text-foreground">{`git checkout integration
+git pull origin integration
+git checkout -b feature/nombre-descriptivo`}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold text-foreground mt-8">Pull Requests Individuales</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Para cada feature branch, se crean <strong className="text-foreground">tres Pull Requests separados e independientes</strong>:
+          </p>
+
+          <div className="grid gap-3">
+            <div className="flex items-start gap-3 p-3 rounded-lg border bg-primary/5 border-primary/20">
+              <span className="text-sm font-bold text-primary">PR 1:</span>
+              <code className="text-sm text-muted-foreground">feature/nombre → dev</code>
+              <span className="text-xs text-muted-foreground">(testing de desarrolladores)</span>
+            </div>
+            <div className="flex items-start gap-3 p-3 rounded-lg border bg-orange-500/5 border-orange-500/20">
+              <span className="text-sm font-bold text-orange-500">PR 2:</span>
+              <code className="text-sm text-muted-foreground">feature/nombre → stg</code>
+              <span className="text-xs text-muted-foreground">(testing de QA y stakeholders)</span>
+            </div>
+            <div className="flex items-start gap-3 p-3 rounded-lg border bg-primary/5 border-primary/20">
+              <span className="text-sm font-bold text-primary">PR 3:</span>
+              <code className="text-sm text-muted-foreground">feature/nombre → integration</code>
+              <span className="text-xs text-muted-foreground">(integración final para release)</span>
+            </div>
+          </div>
+
+          <p className="text-sm text-muted-foreground mt-4">
+            Cada PR se revisa y mergea independientemente. <strong className="text-foreground">Todos los merges son merges normales</strong> (no squash).
+          </p>
+        </div>
+      </section>
+
+      {/* Conflict Resolution */}
+      <section id="conflict-resolution" ref={setRef('conflict-resolution')} className="scroll-mt-24 mt-16">
+        <h2 className="text-3xl font-bold text-foreground mb-6">Manejo de Conflictos</h2>
+
+        <div className="border-l-4 border-error rounded-r-lg bg-error/5 p-5 mb-6">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <h4 className="text-sm font-semibold text-error mb-2">Regla Crítica</h4>
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">NUNCA</strong> hacer merge de <code className="text-primary">dev</code>,{' '}
+                <code className="text-orange-500">stg</code> o <code className="text-error">main</code> hacia el feature branch.
+                El feature branch debe permanecer limpio y contener únicamente los commits del feature.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-muted-foreground leading-relaxed mb-6">
+          Si al momento de crear los PRs existen conflictos con los branches de destino:
+        </p>
+
+        <div className="space-y-3 pl-4">
+          <div className="flex items-start gap-3">
+            <span className="text-primary font-bold">1.</span>
+            <p className="text-sm text-muted-foreground">Crear un nuevo branch específico para resolver conflictos</p>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-primary font-bold">2.</span>
+            <p className="text-sm text-muted-foreground">Resolver los conflictos en ese nuevo branch</p>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-primary font-bold">3.</span>
+            <p className="text-sm text-muted-foreground">Crear un nuevo PR desde el branch de resolución</p>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-error font-bold">4.</span>
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">NO</strong> contaminar el feature branch original con merges de otros branches
+            </p>
+          </div>
         </div>
       </section>
 
       <section id="release-day" ref={setRef('release-day')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Release Day</h2>
+        <h2 className="text-3xl font-bold text-foreground mb-6">Día de Release</h2>
 
-        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Step 1: Squash Merge to Main</h3>
+        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Paso 1: Squash Merge a Main</h3>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          The key to this workflow is the squash merge from integration to main. All commits from the sprint
-          are combined into a single, clean commit on the main branch.
+          La clave de este workflow es el squash merge de integration a main. Todos los commits del sprint
+          se combinan en un único commit limpio en la rama main.
         </p>
 
         <GitDiagram
@@ -127,19 +277,19 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
         />
 
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 my-6">
-          <h4 className="text-sm font-semibold text-primary mb-3">Why Squash?</h4>
+          <h4 className="text-sm font-semibold text-primary mb-3">¿Por qué Squash?</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Clean, linear history on main</li>
-            <li>• Easy to revert entire sprints if needed</li>
-            <li>• Clear release milestones</li>
-            <li>• Simplified auditing</li>
+            <li>• Historial limpio y lineal en main</li>
+            <li>• Fácil revertir sprints completos si es necesario</li>
+            <li>• Hitos de release claros</li>
+            <li>• Auditoría simplificada</li>
           </ul>
         </div>
 
-        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Step 2: Merge Main Back to Integration</h3>
+        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Paso 2: Merge Main de Vuelta a Integration</h3>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          This step is <strong className="text-error">CRITICAL</strong> to avoid conflicts in future sprints.
-          After squashing to main, you must merge main back into integration.
+          Este paso es <strong className="text-error">CRÍTICO</strong> para evitar conflictos en futuros sprints.
+          Después de hacer squash a main, debes mergear main de vuelta a integration.
         </p>
 
         <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto my-6">
@@ -149,11 +299,11 @@ git push origin integration`}</code>
         </pre>
 
         <div className="bg-success/5 border border-success/20 rounded-lg p-6 my-6">
-          <h4 className="text-sm font-semibold text-success mb-3">Result</h4>
+          <h4 className="text-sm font-semibold text-success mb-3">Resultado</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Main: 1 squashed commit</li>
-            <li>• Integration: 10 original commits + 1 merge commit from main</li>
-            <li>• <strong className="text-success">Content is identical in both branches</strong></li>
+            <li>• Main: 1 commit squasheado</li>
+            <li>• Integration: 10 commits originales + 1 commit merge de main</li>
+            <li>• <strong className="text-success">El contenido es idéntico en ambas ramas</strong></li>
           </ul>
         </div>
       </section>
@@ -161,15 +311,15 @@ git push origin integration`}</code>
       <section id="sprint-2" ref={setRef('sprint-2')} className="scroll-mt-24 mt-16">
         <h2 className="text-3xl font-bold text-foreground mb-6">Sprint 2</h2>
 
-        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Starting Fresh</h3>
+        <h3 className="text-xl font-semibold text-foreground mb-4 mt-8">Comenzando de Nuevo</h3>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          With integration now synchronized with main, Sprint 2 begins without conflicts.
-          New features can be developed cleanly from the integration branch.
+          Con integration ahora sincronizada con main, el Sprint 2 comienza sin conflictos.
+          Las nuevas features pueden desarrollarse limpiamente desde la rama de integration.
         </p>
 
         <GitDiagram
           commits={[
-            { id: 'i-sync', branch: 'integration', x: 100, y: 50, message: 'Synced' },
+            { id: 'i-sync', branch: 'integration', x: 100, y: 50, message: 'Sincronizado' },
             { id: 'fc1', branch: 'feature/C', x: 250, y: 100, message: 'feat C' },
             { id: 'fd1', branch: 'feature/D', x: 300, y: 150, message: 'feat D' },
             { id: 'i-s2', branch: 'integration', x: 400, y: 50, message: 'Merge C+D', type: 'merge' },
@@ -191,23 +341,23 @@ git push origin integration`}</code>
         />
 
         <div className="bg-success/5 border border-success/20 rounded-lg p-6 my-6">
-          <h4 className="text-sm font-semibold text-success mb-3">No Conflicts!</h4>
+          <h4 className="text-sm font-semibold text-success mb-3">¡Sin Conflictos!</h4>
           <p className="text-sm text-muted-foreground">
-            Because we merged main back to integration, all new feature branches start from a clean state
-            with no merge conflicts or duplicate commits.
+            Porque mergeamos main de vuelta a integration, todas las nuevas ramas de features comienzan desde un estado limpio
+            sin conflictos de merge o commits duplicados.
           </p>
         </div>
       </section>
 
       <section id="benefits" ref={setRef('benefits')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Benefits</h2>
-        
+        <h2 className="text-3xl font-bold text-foreground mb-6">Beneficios</h2>
+
         <div className="grid gap-4 my-6">
           {[
-            { icon: '✓', title: 'Clean History', desc: 'Main branch has one commit per sprint', color: '#0dde6a' },
-            { icon: '↶', title: 'Easy Reverts', desc: 'Roll back entire sprints with one revert', color: '#0070f3' },
-            { icon: '○', title: 'No Conflicts', desc: 'Proper syncing prevents merge issues', color: '#a855f7' },
-            { icon: '◆', title: 'Clear Releases', desc: 'Easy to track what went out when', color: '#ff0080' },
+            { icon: '✓', title: 'Historial Limpio', desc: 'La rama main tiene un commit por sprint', color: '#0dde6a' },
+            { icon: '↶', title: 'Reversiones Fáciles', desc: 'Revertir sprints completos con un solo revert', color: '#0070f3' },
+            { icon: '○', title: 'Sin Conflictos', desc: 'La sincronización adecuada previene problemas de merge', color: '#a855f7' },
+            { icon: '◆', title: 'Releases Claros', desc: 'Fácil rastrear qué salió cuándo', color: '#ff0080' },
           ].map((benefit, idx) => (
             <div
               key={idx}
@@ -236,28 +386,28 @@ git push origin integration`}</code>
       </section>
 
       <section id="best-practices" ref={setRef('best-practices')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-6">Best Practices</h2>
-        
+        <h2 className="text-3xl font-bold text-foreground mb-6">Mejores Prácticas</h2>
+
         <ul className="space-y-3 text-muted-foreground">
           <li className="flex items-start gap-3">
             <span className="text-primary mt-1">•</span>
-            <span>Always merge main back to integration after release</span>
+            <span>Siempre mergear main de vuelta a integration después del release</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="text-primary mt-1">•</span>
-            <span>Keep sprint durations consistent</span>
+            <span>Mantener duraciones de sprint consistentes</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="text-primary mt-1">•</span>
-            <span>Test thoroughly in integration before releasing</span>
+            <span>Testear exhaustivamente en integration antes de liberar</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="text-primary mt-1">•</span>
-            <span>Document release notes with each squash commit</span>
+            <span>Documentar notas de release con cada commit squash</span>
           </li>
           <li className="flex items-start gap-3">
             <span className="text-primary mt-1">•</span>
-            <span>Tag releases in main for easy reference</span>
+            <span>Etiquetar releases en main para fácil referencia</span>
           </li>
         </ul>
       </section>

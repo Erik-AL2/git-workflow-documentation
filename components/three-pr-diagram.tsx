@@ -1,239 +1,209 @@
 'use client';
 
-import { GitBranch, GitPullRequest, Check, X, Clock } from 'lucide-react';
+import { ArrowRight, Check, GitBranch } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function ThreePRDiagram() {
+  const prs = [
+    {
+      number: 1,
+      title: 'Development',
+      badge: 'dev',
+      color: 'primary',
+      from: 'feature',
+      to: 'dev',
+      requirements: ['Tests pasando', 'Linter OK', 'Build exitoso'],
+      purpose: 'Testing inicial y validación CI/CD',
+    },
+    {
+      number: 2,
+      title: 'Staging',
+      badge: 'stg',
+      color: 'orange',
+      from: 'feature',
+      to: 'stg',
+      requirements: ['1 aprobación', 'QA sign-off', 'PR #1 mergeado'],
+      purpose: 'Testing QA y validación stakeholders',
+    },
+    {
+      number: 3,
+      title: 'Production',
+      badge: 'main',
+      color: 'success',
+      from: 'feature',
+      to: 'main',
+      requirements: ['2+ aprobaciones', 'Tests OK', 'PR #2 mergeado'],
+      purpose: 'Release a producción',
+    },
+  ];
+
+  const colorClasses = {
+    primary: {
+      border: 'border-primary',
+      bg: 'bg-primary/5',
+      text: 'text-primary',
+      badge: 'bg-primary/10 text-primary border-primary/20',
+    },
+    orange: {
+      border: 'border-orange-500',
+      bg: 'bg-orange-500/5',
+      text: 'text-orange-500',
+      badge: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+    },
+    purple: {
+      border: 'border-purple',
+      bg: 'bg-purple/5',
+      text: 'text-purple',
+      badge: 'bg-purple/10 text-purple border-purple/20',
+    },
+    success: {
+      border: 'border-success',
+      bg: 'bg-success/5',
+      text: 'text-success',
+      badge: 'bg-success/10 text-success border-success/20',
+    },
+  };
+
   return (
-    <div className="my-12 bg-card/50 border border-border rounded-xl p-8">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-foreground mb-2">GIT WORKFLOW</h3>
-        <p className="text-sm text-muted-foreground uppercase tracking-wide">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border text-xs font-medium text-muted-foreground mb-3">
+          <GitBranch className="w-3.5 h-3.5" />
           Estrategia de 3 Pull Requests Independientes
-        </p>
+        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
-        {/* Left: Branches */}
-        <div className="flex flex-col gap-6 lg:w-[280px] flex-shrink-0">
-          {/* Main Branch */}
-          <div className="border-2 border-success rounded-lg p-4 bg-success/5">
-            <div className="flex items-center gap-3 mb-2">
-              <GitBranch className="w-5 h-5 text-success" />
-              <div>
-                <div className="font-bold text-success text-lg">MAIN</div>
-                <div className="text-xs text-muted-foreground">PRODUCCIÓN</div>
-              </div>
-            </div>
+      {/* Flow visualization */}
+      <div className="flex flex-col items-center gap-6 mb-8">
+        {/* Top row - main creates feature */}
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-lg border-2 border-muted bg-muted/30">
+            <div className="text-xs font-semibold text-muted-foreground">main</div>
           </div>
-
-          {/* Arrow Down */}
-          <div className="flex justify-center">
-            <div className="text-muted-foreground text-sm">CREAR FEATURE</div>
-          </div>
-
-          {/* Feature Branch */}
-          <div className="border-2 border-purple rounded-lg p-4 bg-purple/5">
-            <div className="flex items-center gap-3 mb-2">
-              <GitBranch className="w-5 h-5 text-purple" />
-              <div>
-                <div className="font-bold text-purple text-lg">FEATURE</div>
-                <div className="text-xs text-muted-foreground">DESARROLLO</div>
-              </div>
-            </div>
+          <ArrowRight className="w-5 h-5 text-muted-foreground" />
+          <div className="px-4 py-2 rounded-lg border-2 border-purple bg-purple/10">
+            <div className="text-xs font-semibold text-purple">feature</div>
           </div>
         </div>
 
-        {/* Right: PRs */}
-        <div className="flex-1 space-y-4">
-          {/* PR #1 Development */}
-          <div className="border-l-4 border-primary rounded-lg bg-primary/5 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="text-xs text-primary font-semibold mb-1">PR #1</div>
-                <div className="text-xl font-bold text-foreground">Development</div>
-              </div>
-              <div className="text-xs text-muted-foreground bg-card px-3 py-1 rounded-full border border-border">
-                feature → dev
-              </div>
-            </div>
+        {/* Visual branching indicator */}
+        <div className="flex flex-col items-center -my-3">
+          <div className="w-px h-8 bg-purple/50" />
+          <div className="flex items-center gap-2">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-purple/50 to-transparent" />
+            <GitBranch className="w-4 h-4 text-purple rotate-90" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-purple/50 to-transparent" />
+          </div>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Propósito
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Testing inicial</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Validación CI/CD</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Code review opcional</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Requisitos
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>Tests pasando</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>Linter OK</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>Build exitoso</span>
-                  </li>
-                </ul>
+        {/* Bottom row - 3 PRs */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-4 py-3 rounded-lg border-2 border-primary/30 bg-primary/5">
+            <div className="flex flex-col items-center gap-1">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #1</div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-purple">feature</span>
+                <ArrowRight className="w-3 h-3 text-primary" />
+                <span className="text-xs font-semibold text-primary">dev</span>
               </div>
             </div>
           </div>
 
-          {/* PR #2 Staging */}
-          <div className="border-l-4 border-purple rounded-lg bg-purple/5 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="text-xs text-purple font-semibold mb-1">PR #2</div>
-                <div className="text-xl font-bold text-foreground">Staging</div>
-              </div>
-              <div className="text-xs text-muted-foreground bg-card px-3 py-1 rounded-full border border-border">
-                feature → stg
-              </div>
-            </div>
+          <span className="text-muted-foreground text-sm font-bold">+</span>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Propósito
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Testing QA</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Validación stakeholders</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Requisitos
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>1 aprobación requerida</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>QA sign-off</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>PR a dev mergeado</span>
-                  </li>
-                </ul>
+          <div className="flex items-center gap-2 px-4 py-3 rounded-lg border-2 border-orange-500/30 bg-orange-500/5">
+            <div className="flex flex-col items-center gap-1">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #2</div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-purple">feature</span>
+                <ArrowRight className="w-3 h-3 text-orange-500" />
+                <span className="text-xs font-semibold text-orange-500">stg</span>
               </div>
             </div>
           </div>
 
-          {/* PR #3 Production */}
-          <div className="border-l-4 border-success rounded-lg bg-success/5 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="text-xs text-success font-semibold mb-1">PR #3</div>
-                <div className="text-xl font-bold text-foreground">Production</div>
-              </div>
-              <div className="text-xs text-muted-foreground bg-card px-3 py-1 rounded-full border border-border">
-                feature → main
-              </div>
-            </div>
+          <span className="text-muted-foreground text-sm font-bold">+</span>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Propósito
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Release a producción</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Deploy a usuarios</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span>→</span>
-                    <span>Versión estable</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <div className="font-semibold text-foreground mb-2 uppercase text-xs tracking-wide">
-                  Requisitos
-                </div>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>2+ aprobaciones</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>Todos los tests OK</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>→</span>
-                    <span>PR a stg mergeado</span>
-                  </li>
-                </ul>
+          <div className="flex items-center gap-2 px-4 py-3 rounded-lg border-2 border-success/30 bg-success/5">
+            <div className="flex flex-col items-center gap-1">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PR #3</div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-purple">feature</span>
+                <ArrowRight className="w-3 h-3 text-success" />
+                <span className="text-xs font-semibold text-success">main</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom explanation */}
-      <div className="mt-8 border border-primary/40 rounded-lg bg-primary/5 p-6">
-        <h4 className="text-sm font-bold text-primary mb-3 uppercase tracking-wide">
-          ¿Por qué 3 PRs independientes?
-        </h4>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Este workflow permite que cada feature avance a su propio ritmo. Si una funcionalidad no pasa QA o validación de stakeholders, 
-          se queda en dev o stg <strong>sin retrasar otras features</strong> que ya están listas para producción. 
-          Cada PR se mergea cuando cumple sus requisitos específicos, evitando bloqueos entre equipos.
-        </p>
+      {/* PR Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {prs.map((pr) => {
+          const colors = colorClasses[pr.color as keyof typeof colorClasses];
+
+          return (
+            <div
+              key={pr.number}
+              className={cn(
+                'border rounded-lg overflow-hidden transition-all duration-200',
+                'hover:shadow-lg hover:scale-[1.02]',
+                colors.border
+              )}
+            >
+              {/* Header */}
+              <div className={cn('px-4 py-3 border-b', colors.bg, colors.border)}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={cn('text-xs font-bold', colors.text)}>
+                    PR #{pr.number}
+                  </span>
+                  <div className={cn('px-2 py-0.5 rounded text-[10px] font-mono border', colors.badge)}>
+                    {pr.from} → {pr.to}
+                  </div>
+                </div>
+                <h3 className="font-bold text-foreground">{pr.title}</h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 space-y-4">
+                {/* Purpose */}
+                <div>
+                  <div className="text-xs font-semibold text-foreground mb-2">Propósito</div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{pr.purpose}</p>
+                </div>
+
+                {/* Requirements */}
+                <div>
+                  <div className="text-xs font-semibold text-foreground mb-2">Requisitos</div>
+                  <ul className="space-y-1.5">
+                    {pr.requirements.map((req, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <Check className={cn('w-3 h-3 flex-shrink-0 mt-0.5', colors.text)} />
+                        <span>{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Legend */}
-      <div className="mt-6 flex flex-wrap gap-4 justify-center text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-primary" />
-          <span className="text-muted-foreground">DEVELOPMENT</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-purple" />
-          <span className="text-muted-foreground">STAGING</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-success" />
-          <span className="text-muted-foreground">PRODUCTION</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-purple" />
-          <span className="text-muted-foreground">FEATURE</span>
+      {/* Bottom note */}
+      <div className="border border-primary/30 rounded-lg bg-primary/5 p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-1 h-full bg-primary rounded-full flex-shrink-0 mt-1" />
+          <div>
+            <h4 className="text-sm font-semibold text-foreground mb-1">
+              ¿Por qué 3 PRs independientes?
+            </h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Cada feature avanza a su propio ritmo. Si una no pasa QA, se queda en dev/stg{' '}
+              <strong className="text-foreground">sin retrasar otras features</strong> listas para producción.
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -2,8 +2,12 @@ export const workflows = [
   {
     id: 'squash-merge',
     title: 'Squash Merge & Release Cycle',
-    description: 'Sprint-based workflow with squash merges to main',
+    description: 'Workflow basado en sprints con squash merges a main',
     sections: [
+      {
+        id: 'overview',
+        title: 'Descripción General',
+      },
       {
         id: 'sprint-1',
         title: 'Sprint 1',
@@ -11,13 +15,21 @@ export const workflows = [
       },
       {
         id: 'release-day',
-        title: 'Release Day',
+        title: 'Día de Release',
         diagramId: 'release-diagram',
       },
       {
         id: 'sprint-2',
         title: 'Sprint 2',
         diagramId: 'sprint-2-diagram',
+      },
+      {
+        id: 'benefits',
+        title: 'Beneficios',
+      },
+      {
+        id: 'best-practices',
+        title: 'Mejores Prácticas',
       },
     ],
   },
@@ -32,11 +44,11 @@ export const workflows = [
       },
       {
         id: 'flujo-visual',
-        title: 'Flujo Visual',
+        title: 'Cómo Funciona',
       },
       {
         id: 'proceso-detallado',
-        title: 'Proceso Detallado',
+        title: 'Paso a Paso',
       },
       {
         id: 'github-actions',

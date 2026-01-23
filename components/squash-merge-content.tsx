@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { AlertTriangle, Check, CheckCircle, GitMerge, Info, Minus, RotateCcw, ShieldCheck } from 'lucide-react';
 import { GitDiagram } from '@/components/git-diagram';
+import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
 
 interface SquashMergeContentProps {
   onSectionChange: (sectionId: string) => void;
@@ -130,9 +131,9 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
             { id: 'i2', branch: 'integration', x: 500, y: 50, message: 'Merge A+B', type: 'merge' },
           ]}
           branches={[
-            { name: 'integration', color: '#0070f3', y: 50 },
-            { name: 'feature/A', color: '#0dde6a', y: 100 },
-            { name: 'feature/B', color: '#a855f7', y: 150 },
+            { name: 'integration', color: BRANCH_COLORS_HEX.integration, y: 50 },
+            { name: 'feature/A', color: BRANCH_COLORS_HEX.feature, y: 100 },
+            { name: 'feature/B', color: BRANCH_COLORS_HEX.feature, y: 150 },
           ]}
           connections={[
             { from: 'i1', to: 'fa1' },
@@ -266,8 +267,8 @@ git checkout -b feature/nombre-descriptivo`}</code>
             { id: 'm2', branch: 'main', x: 300, y: 150, message: 'Sprint 1', type: 'squash' },
           ]}
           branches={[
-            { name: 'integration', color: '#0070f3', y: 50 },
-            { name: 'main', color: '#ff0080', y: 150 },
+            { name: 'integration', color: BRANCH_COLORS_HEX.integration, y: 50 },
+            { name: 'main', color: BRANCH_COLORS_HEX.main, y: 150 },
           ]}
           connections={[
             { from: 'i-full', to: 'm2', type: 'merge' },
@@ -349,10 +350,10 @@ git push origin integration`}</code>
             { id: 'm-s1', branch: 'main', x: 100, y: 200, message: 'Sprint 1' },
           ]}
           branches={[
-            { name: 'integration', color: '#0070f3', y: 50 },
-            { name: 'feature/C', color: '#0dde6a', y: 100 },
-            { name: 'feature/D', color: '#a855f7', y: 150 },
-            { name: 'main', color: '#ff0080', y: 200 },
+            { name: 'integration', color: BRANCH_COLORS_HEX.integration, y: 50 },
+            { name: 'feature/C', color: BRANCH_COLORS_HEX.feature, y: 100 },
+            { name: 'feature/D', color: BRANCH_COLORS_HEX.feature, y: 150 },
+            { name: 'main', color: BRANCH_COLORS_HEX.main, y: 200 },
           ]}
           connections={[
             { from: 'i-sync', to: 'fc1' },

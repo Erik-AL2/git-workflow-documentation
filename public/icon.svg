@@ -1,38 +1,32 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @media (prefers-color-scheme: light) {
-      .background { fill: #0a0a0a; }
-      .branch-line { stroke: #ffffff; }
-      .node { fill: #ffffff; }
-      .accent { fill: #3b82f6; }
-    }
-    @media (prefers-color-scheme: dark) {
-      .background { fill: #ffffff; }
-      .branch-line { stroke: #0a0a0a; }
-      .node { fill: #0a0a0a; }
-      .accent { fill: #3b82f6; }
-    }
-  </style>
-  <rect class="background" width="180" height="180" rx="37" />
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Modern Git Branch Icon - No background -->
 
-  <!-- Git branch icon -->
-  <g transform="translate(90, 90)">
-    <!-- Main vertical line -->
-    <line class="branch-line" x1="0" y1="-50" x2="0" y2="50" stroke-width="8" stroke-linecap="round"/>
+  <!-- Main vertical line -->
+  <path
+    d="M16 4 L16 28"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+  />
 
-    <!-- Branch line going right -->
-    <path class="branch-line" d="M 0 -20 Q 20 -20, 35 0" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Branch curve -->
+  <path
+    d="M16 12 Q22 12, 24 18"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    fill="none"
+  />
 
-    <!-- Top node (commit) -->
-    <circle class="node" cx="0" cy="-50" r="14"/>
+  <!-- Top commit node -->
+  <circle cx="16" cy="4" r="3" fill="currentColor"/>
 
-    <!-- Middle node (branch point) -->
-    <circle class="accent" cx="0" cy="-20" r="14"/>
+  <!-- Branch point node (accent color) -->
+  <circle cx="16" cy="12" r="3.5" fill="#3b82f6"/>
 
-    <!-- Branch end node -->
-    <circle class="node" cx="35" cy="0" r="14"/>
+  <!-- Branch end node -->
+  <circle cx="24" cy="18" r="3" fill="currentColor"/>
 
-    <!-- Bottom node (commit) -->
-    <circle class="node" cx="0" cy="50" r="14"/>
-  </g>
+  <!-- Bottom commit node -->
+  <circle cx="16" cy="28" r="3" fill="currentColor"/>
 </svg>

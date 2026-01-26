@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Diagram } from '@/lib/types';
 import { GitTreeDiagram } from '@/components/diagrams/git-tree-diagram';
 import { FlowDiagram } from '@/components/diagrams/flow-diagram';
-import { ZoomIn, ZoomOut, Maximize2 } from '@/components/icons';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DiagramPanelProps {

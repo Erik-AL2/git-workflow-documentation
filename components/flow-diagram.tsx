@@ -2,7 +2,7 @@
 
 import React from "react"
 
-import { ArrowDown } from '@/components/icons';
+import { ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FlowNode {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-// Icons are rendered inline in the copy button via SVG string
+import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 

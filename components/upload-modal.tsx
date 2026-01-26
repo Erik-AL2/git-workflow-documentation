@@ -4,7 +4,7 @@ import React from "react"
 import { toast } from 'react-toastify'; // Import toast from react-toastify
 
 import { useState, useRef } from 'react';
-import { Upload, FileJson, FileText, CheckCircle, AlertCircle } from '@/components/icons';
+import { Upload, X, FileJson, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Workflow } from '@/lib/types';

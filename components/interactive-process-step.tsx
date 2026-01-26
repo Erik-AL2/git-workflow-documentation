@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, Circle, CheckCircle2, Clock, AlertCircle } from '@/components/icons';
+import { ChevronRight, Circle, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 

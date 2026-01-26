@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, Search, Trash2, Upload, GitHubLogo } from '@/components/icons';
+import { ChevronDown, ChevronRight, Search, Trash2, ChevronLeft, ChevronRight as ChevronRightIcon, Upload, FileCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -75,7 +75,7 @@ export function Sidebar({
           onClick={onToggleCollapse}
           className="vercel-transition"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRightIcon className="w-5 h-5" />
         </Button>
       </aside>
     );
@@ -86,7 +86,15 @@ export function Sidebar({
       <div className="px-6 pt-8 pb-6 space-y-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <GitHubLogo className="w-5 h-5 text-primary" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="w-5 h-5 text-primary"
+            >
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+            </svg>
           </div>
           <h1 className="text-lg font-semibold text-foreground">Git Workflows</h1>
         </div>

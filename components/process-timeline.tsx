@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronDown, Check, Circle } from '@/components/icons';
+import { ChevronDown, Check, Circle } from 'lucide-react';
 
 interface ProcessStep {
   number: number;

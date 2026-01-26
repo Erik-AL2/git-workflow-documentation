@@ -7,7 +7,7 @@ import { ThreePRFlowDiagram } from '@/components/three-pr-flow-diagram';
 import { ProcessTimeline } from '@/components/process-timeline';
 import { GitHubActionsSection } from '@/components/github-actions-section';
 import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
-import { GitBranch, GitPullRequest, Check, X, CheckSquare, Square, AlertTriangle } from '@/components/icons';
+import { GitBranch, GitPullRequest, Check, X, CheckSquare, Square, AlertTriangle } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,

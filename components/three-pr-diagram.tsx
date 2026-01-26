@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check, GitBranch } from '@/components/icons';
+import { ArrowRight, Check, GitBranch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function ThreePRDiagram() {

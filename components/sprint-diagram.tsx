@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { GitBranch, GitMerge, GitCommit, ArrowRight, ArrowDown } from 'lucide-react';
+import { GitBranch, GitMerge, GitCommit, ArrowRight, ArrowDown } from '@/components/icons';
 
 interface SprintDiagramProps {
   activeSection: string;

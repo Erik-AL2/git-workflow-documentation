@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { GitBranch } from 'lucide-react';
+import { GitBranch } from '@/components/icons';
 
 interface WorkflowSelectorProps {
   workflows: Array<{ id: string; title: string; description: string }>;

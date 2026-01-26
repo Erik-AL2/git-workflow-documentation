@@ -1,7 +1,7 @@
 'use client';
 
 import { Diagram } from '@/lib/types';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from '@/components/icons';
 
 interface FlowDiagramProps {
   diagram: Diagram;

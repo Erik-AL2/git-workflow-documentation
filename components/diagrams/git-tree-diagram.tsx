@@ -1,7 +1,7 @@
 'use client';
 
 import { Diagram } from '@/lib/types';
-import { GitBranch, GitCommit, GitMerge } from 'lucide-react';
+import { GitBranch, GitCommit, GitMerge } from '@/components/icons';
 
 interface GitTreeDiagramProps {
   diagram: Diagram;

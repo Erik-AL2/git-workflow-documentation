@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, FileCode2, Workflow } from 'lucide-react';
+import { Check, FileCode2, Workflow } from '@/components/icons';
 
 export function GitHubActionsSection() {
   return (

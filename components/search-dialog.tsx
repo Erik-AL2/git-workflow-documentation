@@ -3,7 +3,7 @@
 import React from "react"
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, FileText } from 'lucide-react';
+import { Search, FileText } from '@/components/icons';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Workflow } from '@/lib/types';

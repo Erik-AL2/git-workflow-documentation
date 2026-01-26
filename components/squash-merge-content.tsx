@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { AlertTriangle, Check, CheckCircle, GitMerge, Info, Minus, RotateCcw, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Check, CheckCircle, GitMerge, Info, Minus, RotateCcw, ShieldCheck } from '@/components/icons';
 import { GitDiagram } from '@/components/git-diagram';
 import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
 

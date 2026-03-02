@@ -5,17 +5,17 @@
 
 :root {
   --background: #000000;
-  --foreground: #ffffff;
+  --foreground: #f0f0f0;
   --card: #0a0a0a;
-  --card-foreground: #ffffff;
+  --card-foreground: #f0f0f0;
   --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
+  --popover-foreground: #f0f0f0;
   --primary: #0070f3;
   --primary-foreground: #ffffff;
   --secondary: #333333;
   --secondary-foreground: #ffffff;
-  --muted: #1a1a1a;
-  --muted-foreground: #888888;
+  --muted: #111111;
+  --muted-foreground: #737373;
   --accent: #0070f3;
   --accent-foreground: #ffffff;
   --success: #0dde6a;
@@ -32,33 +32,33 @@
   --branch-integration: #0070f3;
   --branch-work: #a855f7;
   --destructive-foreground: #ffffff;
-  --border: #333333;
+  --border: #1e1e1e;
   --input: #1a1a1a;
   --ring: #0070f3;
-  --radius: 0.5rem;
+  --radius: 0.625rem;
   --sidebar: #0a0a0a;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #0070f3;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1a1a1a;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #333333;
+  --sidebar-border: #1e1e1e;
   --sidebar-ring: #0070f3;
 }
 
 .dark {
   --background: #000000;
-  --foreground: #ffffff;
+  --foreground: #f0f0f0;
   --card: #0a0a0a;
-  --card-foreground: #ffffff;
+  --card-foreground: #f0f0f0;
   --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
+  --popover-foreground: #f0f0f0;
   --primary: #0070f3;
   --primary-foreground: #ffffff;
   --secondary: #333333;
   --secondary-foreground: #ffffff;
-  --muted: #1a1a1a;
-  --muted-foreground: #888888;
+  --muted: #111111;
+  --muted-foreground: #737373;
   --accent: #0070f3;
   --accent-foreground: #ffffff;
   --success: #0dde6a;
@@ -75,7 +75,7 @@
   --branch-integration: #0070f3;
   --branch-work: #a855f7;
   --destructive-foreground: #ffffff;
-  --border: #333333;
+  --border: #1e1e1e;
   --input: #1a1a1a;
   --ring: #0070f3;
   --sidebar: #0a0a0a;
@@ -84,13 +84,14 @@
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1a1a1a;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #333333;
+  --sidebar-border: #1e1e1e;
   --sidebar-ring: #0070f3;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Geist', 'Geist Fallback', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --font-display: 'Instrument Serif', Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -143,46 +144,182 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
 }
 
 @layer utilities {
-  .vercel-transition {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .glass-morphism {
-    backdrop-filter: blur(12px);
-    background: rgba(10, 10, 10, 0.8);
-  }
-  
-  .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(0, 112, 243, 0.3);
-  }
-  
+  /* ---- Prose (dark documentation style) ---- */
   .prose-dark {
     @apply text-foreground;
   }
-  
   .prose-dark h1,
   .prose-dark h2,
   .prose-dark h3,
   .prose-dark h4 {
     @apply text-foreground;
   }
-  
   .prose-dark a {
     @apply text-primary hover:text-primary/80;
   }
-  
   .prose-dark code {
-    @apply bg-card text-foreground px-1 py-0.5 rounded;
+    @apply bg-white/[0.04] text-foreground px-1.5 py-0.5 rounded-md text-[0.9em] border border-white/[0.06];
   }
-  
+  .prose-dark pre code {
+    @apply bg-transparent border-0 p-0 rounded-none text-[1em];
+  }
   .prose-dark pre {
-    @apply bg-card border border-border;
+    @apply bg-transparent border-0;
+  }
+
+  /* ---- Section divider ---- */
+  .section-divider {
+    @apply relative;
+  }
+  .section-divider::before {
+    content: '';
+    @apply absolute -top-8 left-0 right-0 h-px;
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  }
+
+  /* ---- Subtle background grain ---- */
+  .grain {
+    position: relative;
+  }
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.012;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* ---- Callout left-bar accent ---- */
+  .callout-bar {
+    @apply relative pl-4;
+  }
+  .callout-bar::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-[2px] rounded-full;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  /* ---- Terminal code block ---- */
+  .terminal {
+    @apply relative rounded-xl overflow-hidden;
+    background: #050505;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .terminal-header {
+    @apply flex items-center gap-1.5 px-4 py-2.5;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .terminal-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+  }
+  .terminal-body {
+    @apply p-4 text-sm font-mono overflow-x-auto leading-relaxed;
+    color: #a0a0a0;
+  }
+  .terminal-body .cmd {
+    color: #e0e0e0;
+  }
+
+  /* ---- Glow card effect ---- */
+  .glow-card {
+    @apply relative rounded-xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .glow-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  /* ---- Gradient border cards ---- */
+  .gradient-border {
+    @apply relative rounded-xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .gradient-border::before {
+    content: '';
+    @apply absolute inset-0 rounded-xl;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ---- Step indicator ---- */
+  .step-number {
+    @apply w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--muted-foreground);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ---- Fade-in on scroll (uses IntersectionObserver in React, but CSS handles the transition) ---- */
+  .fade-section {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---- Refined table ---- */
+  .refined-table {
+    @apply w-full text-sm rounded-xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .refined-table thead tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .refined-table th {
+    @apply text-left p-4 font-medium text-muted-foreground text-xs uppercase tracking-wider;
+  }
+  .refined-table td {
+    @apply p-4;
+  }
+  .refined-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease;
+  }
+  .refined-table tbody tr:last-child {
+    border-bottom: none;
+  }
+  .refined-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* ---- Branch card hover glow ---- */
+  .branch-card {
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .branch-card:hover {
+    box-shadow: 0 0 30px -8px var(--branch-glow, transparent);
+  }
+
+  /* ---- Section header with large number watermark ---- */
+  .section-header {
+    @apply relative;
+  }
+  .section-number {
+    @apply absolute -left-2 -top-6 text-7xl font-bold pointer-events-none select-none font-display;
+    color: rgba(255, 255, 255, 0.025);
+    line-height: 1;
   }
 }

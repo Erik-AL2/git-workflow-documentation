@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { AlertTriangle, Check, CheckCircle, Flag, GitMerge, Info, Minus, RotateCcw, ShieldCheck } from 'lucide-react';
 import { GitDiagram } from '@/components/git-diagram';
+import { TerminalBlock } from '@/components/terminal-block';
 import { BRANCH_COLORS_HEX } from '@/lib/branch-colors';
 
 interface SquashMergeContentProps {
@@ -11,7 +12,9 @@ interface SquashMergeContentProps {
 
 export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps) {
   const sectionsRef = useRef<{ [key: string]: HTMLElement }>({});
+  const fadeRef = useRef<HTMLElement[]>([]);
 
+  // Section tracking observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -31,67 +34,92 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
     return () => observer.disconnect();
   }, [onSectionChange]);
 
+  // Fade-in on scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { rootMargin: '0px 0px -60px 0px', threshold: 0.1 }
+    );
+
+    fadeRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const setRef = (id: string) => (el: HTMLElement | null) => {
     if (el) sectionsRef.current[id] = el;
   };
 
+  const addFadeRef = useCallback((el: HTMLDivElement | null) => {
+    if (el && !fadeRef.current.includes(el)) {
+      fadeRef.current.push(el);
+    }
+  }, []);
+
   return (
-    <div className="prose prose-dark max-w-none">
+    <div className="prose prose-dark max-w-none space-y-0">
       {/* ===================== OVERVIEW ===================== */}
       <section id="overview" ref={setRef('overview')} className="scroll-mt-24">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Descripción General</h2>
-        <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-          Este workflow está diseñado para desarrollo basado en sprints con ciclos de release limpios usando squash merges.
-          Mantiene un historial limpio y lineal en main mientras acumula el trabajo del sprint en stg.
-        </p>
+        <div className="section-header">
+          <span className="section-number">01</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
+            Descripción General
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">
+            Workflow diseñado para desarrollo basado en sprints con ciclos de release limpios usando squash merges.
+            Historial limpio y lineal en main, trabajo acumulado del sprint en stg.
+          </p>
+        </div>
 
         {/* Branch Structure */}
-        <div className="space-y-4 mb-6">
-          <h3 className="text-xl font-semibold text-foreground">Estructura de Branches</h3>
+        <div ref={addFadeRef} className="fade-section mb-8">
+          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            Estructura de Branches
+          </h3>
 
-          <div className="grid gap-3">
-            {/* main */}
-            <div className="border border-error/30 rounded-lg bg-error/5 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <code className="text-sm font-bold text-error">main</code>
-                <span className="text-xs text-muted-foreground">— Código en producción. Fuente de verdad.</span>
+          <div className="grid gap-2">
+            {[
+              { name: 'main', color: '#ff0080', colorClass: 'text-error', label: 'Código en producción. Fuente de verdad.', desc: 'Refleja exactamente lo que está corriendo en el ambiente de producción.' },
+              { name: 'stg', color: '#fb923c', colorClass: 'text-orange-500', label: 'Ambiente de staging/integración', desc: 'Acumula los features del sprint. QA y stakeholders validan acá. Cumple el rol de rama de integración.' },
+              { name: 'dev', color: '#0070f3', colorClass: 'text-primary', label: 'Ambiente de desarrollo', desc: 'Para testing individual de desarrolladores.' },
+            ].map((branch) => (
+              <div
+                key={branch.name}
+                className="branch-card gradient-border p-4 flex items-start gap-4 transition-all duration-300"
+                style={{ '--branch-glow': branch.color } as React.CSSProperties}
+              >
+                <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: branch.color }} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <code className={`text-sm font-bold ${branch.colorClass} font-mono`}>{branch.name}</code>
+                    <span className="text-xs text-muted-foreground/60">—</span>
+                    <span className="text-xs text-muted-foreground">{branch.label}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground/70 leading-relaxed">
+                    {branch.desc}
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Refleja exactamente lo que está corriendo en el ambiente de producción.
-              </p>
-            </div>
-
-            {/* stg */}
-            <div className="border border-orange-500/30 rounded-lg bg-orange-500/5 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <code className="text-sm font-bold text-orange-500">stg</code>
-                <span className="text-xs text-muted-foreground">— Ambiente de staging/integración</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Acumula los features del sprint. QA y stakeholders validan acá.
-                Cumple el rol de rama de integración.
-              </p>
-            </div>
-
-            {/* dev */}
-            <div className="border border-primary/30 rounded-lg bg-primary/5 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <code className="text-sm font-bold text-primary">dev</code>
-                <span className="text-xs text-muted-foreground">— Ambiente de desarrollo</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Para testing individual de desarrolladores.
-              </p>
-            </div>
+            ))}
           </div>
 
           {/* Key Principle */}
-          <div className="border border-border rounded-lg bg-muted/30 p-4 mt-4">
+          <div className="mt-5 gradient-border p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+              <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Info className="w-3.5 h-3.5 text-primary" />
+              </div>
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Principio Clave</h4>
-                <p className="text-sm text-muted-foreground">
+                <h4 className="text-sm font-medium text-foreground mb-1">Principio Clave</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   <code className="text-orange-500 font-semibold">stg</code> cumple el rol de integración.
                   Después de cada release, <code className="text-error font-semibold">main</code> se mergea a{' '}
                   <code className="text-orange-500 font-semibold">stg</code> y{' '}
@@ -104,50 +132,60 @@ export function SquashMergeContent({ onSectionChange }: SquashMergeContentProps)
       </section>
 
       {/* ===================== SPRINT 1 ===================== */}
-      <section id="sprint-1" ref={setRef('sprint-1')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Sprint 1</h2>
+      <section id="sprint-1" ref={setRef('sprint-1')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">02</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
+            Sprint 1
+          </h2>
+        </div>
 
-        <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">Desarrollo de Features</h3>
-        <p className="text-muted-foreground leading-relaxed mb-5">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mt-8 mb-3">
+          Desarrollo de Features
+        </h3>
+        <p className="text-muted-foreground leading-relaxed mb-5 max-w-2xl">
           Los feature branches se crean desde <code className="text-error font-semibold">main</code>.
           Cada feature tiene 2 PRs que se mergean de forma normal (no squash).
         </p>
 
-        <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto mb-6">
-          <code className="text-foreground">{`git checkout main
-git pull origin main
-git checkout -b feature/nombre-descriptivo`}</code>
-        </pre>
+        <div ref={addFadeRef} className="fade-section mb-8">
+          <TerminalBlock code={`git checkout main\ngit pull origin main\ngit checkout -b feature/nombre-descriptivo`} />
+        </div>
 
-        <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">2 PRs por Feature</h3>
-        <p className="text-sm text-muted-foreground mb-4">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mt-10 mb-3">
+          2 PRs por Feature
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4 max-w-2xl">
           Para cada feature branch, se crean <strong className="text-foreground">dos Pull Requests</strong> (merge normal, no squash):
         </p>
 
-        {/* PR Table */}
-        <div className="border border-border rounded-lg overflow-hidden mb-6">
-          <table className="w-full text-sm">
+        <div ref={addFadeRef} className="fade-section">
+          <table className="refined-table mb-8">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left p-3 font-semibold text-foreground">PR</th>
-                <th className="text-left p-3 font-semibold text-foreground">Dirección</th>
-                <th className="text-left p-3 font-semibold text-foreground">Propósito</th>
+              <tr>
+                <th>PR</th>
+                <th>Dirección</th>
+                <th>Propósito</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-border">
-                <td className="p-3 font-bold text-primary">PR 1</td>
-                <td className="p-3 text-muted-foreground">
-                  <code className="text-success">feature/nombre</code> → <code className="text-primary">dev</code>
+              <tr>
+                <td className="font-semibold text-primary">PR 1</td>
+                <td className="text-muted-foreground">
+                  <code className="text-success">feature/nombre</code>
+                  <span className="text-muted-foreground/40 mx-1.5">&rarr;</span>
+                  <code className="text-primary">dev</code>
                 </td>
-                <td className="p-3 text-muted-foreground">Testing de desarrolladores</td>
+                <td className="text-muted-foreground">Testing de desarrolladores</td>
               </tr>
               <tr>
-                <td className="p-3 font-bold text-orange-500">PR 2</td>
-                <td className="p-3 text-muted-foreground">
-                  <code className="text-success">feature/nombre</code> → <code className="text-orange-500">stg</code>
+                <td className="font-semibold text-orange-500">PR 2</td>
+                <td className="text-muted-foreground">
+                  <code className="text-success">feature/nombre</code>
+                  <span className="text-muted-foreground/40 mx-1.5">&rarr;</span>
+                  <code className="text-orange-500">stg</code>
                 </td>
-                <td className="p-3 text-muted-foreground">Testing QA/stakeholders + integración</td>
+                <td className="text-muted-foreground">Testing QA/stakeholders + integración</td>
               </tr>
             </tbody>
           </table>
@@ -187,35 +225,43 @@ git checkout -b feature/nombre-descriptivo`}</code>
           height={400}
         />
 
-        <div className="bg-card border border-border rounded-lg p-5 my-5">
-          <h4 className="text-sm font-semibold text-foreground mb-3">Estado al Final del Sprint 1</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-orange-500 mt-0.5" />
+        {/* End of sprint state */}
+        <div ref={addFadeRef} className="fade-section gradient-border p-5 mt-6">
+          <h4 className="text-sm font-medium text-foreground mb-3">Estado al Final del Sprint 1</h4>
+          <div className="space-y-2.5">
+            <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <Check className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
               <span><code className="text-orange-500">stg</code> tiene todos los commits de los features del sprint</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Minus className="w-4 h-4 text-muted-foreground mt-0.5" />
+            </div>
+            <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <Minus className="w-4 h-4 text-muted-foreground/40 mt-0.5 flex-shrink-0" />
               <span><code className="text-error">main</code> sin cambios</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-success mt-0.5" />
+            </div>
+            <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
               <span>Todas las features testeadas y aprobadas en stg</span>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ===================== CONFLICT RESOLUTION ===================== */}
-      <section id="conflict-resolution" ref={setRef('conflict-resolution')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Manejo de Conflictos</h2>
+      <section id="conflict-resolution" ref={setRef('conflict-resolution')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">03</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-4 tracking-tight">
+            Manejo de Conflictos
+          </h2>
+        </div>
 
-        <div className="border border-error/30 rounded-lg bg-error/5 p-4 mb-5">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-error mt-0.5" />
+        {/* Critical rule */}
+        <div ref={addFadeRef} className="fade-section relative rounded-xl overflow-hidden mb-6" style={{ background: 'rgba(255,0,128,0.04)', border: '1px solid rgba(255,0,128,0.1)' }}>
+          <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: '#ff0080' }} />
+          <div className="flex items-start gap-3 p-4 pl-5">
+            <AlertTriangle className="w-4 h-4 text-error mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-error mb-2">Regla Crítica</h4>
-              <p className="text-sm text-muted-foreground">
+              <h4 className="text-sm font-medium text-error mb-1">Regla Crítica</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 <strong className="text-foreground">NUNCA</strong> hacer merge de{' '}
                 <code className="text-primary">dev</code>,{' '}
                 <code className="text-orange-500">stg</code> o{' '}
@@ -225,26 +271,27 @@ git checkout -b feature/nombre-descriptivo`}</code>
           </div>
         </div>
 
-        <p className="text-muted-foreground leading-relaxed mb-4">
+        <p className="text-muted-foreground leading-relaxed mb-5">
           Si hay conflictos al crear los PRs:
         </p>
 
-        <div className="space-y-3 pl-4 mb-6">
+        {/* Steps */}
+        <div ref={addFadeRef} className="fade-section space-y-3 mb-8">
+          {[
+            { num: '1', text: 'Crear un nuevo branch específico para resolver conflictos' },
+            { num: '2', text: 'Resolver los conflictos en ese branch' },
+            { num: '3', text: 'Crear un nuevo PR desde el branch de resolución' },
+          ].map((step) => (
+            <div key={step.num} className="flex items-start gap-3">
+              <span className="step-number">{step.num}</span>
+              <p className="text-sm text-muted-foreground pt-1">{step.text}</p>
+            </div>
+          ))}
           <div className="flex items-start gap-3">
-            <span className="text-primary font-bold">1.</span>
-            <p className="text-sm text-muted-foreground">Crear un nuevo branch específico para resolver conflictos</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-primary font-bold">2.</span>
-            <p className="text-sm text-muted-foreground">Resolver los conflictos en ese branch</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-primary font-bold">3.</span>
-            <p className="text-sm text-muted-foreground">Crear un nuevo PR desde el branch de resolución</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-error font-bold">4.</span>
-            <p className="text-sm text-muted-foreground">
+            <span className="step-number" style={{ borderColor: 'rgba(255,0,128,0.2)', color: '#ff0080' }}>
+              4
+            </span>
+            <p className="text-sm text-muted-foreground pt-1">
               <strong className="text-foreground">NO</strong> contaminar el feature branch original
             </p>
           </div>
@@ -275,68 +322,80 @@ git checkout -b feature/nombre-descriptivo`}</code>
       </section>
 
       {/* ===================== FEATURES QUE NO LLEGAN A RELEASE ===================== */}
-      <section id="features-no-release" ref={setRef('features-no-release')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Features que no llegan a Release</h2>
-        <p className="text-muted-foreground leading-relaxed mb-6">
-          Si un feature que ya está en <code className="text-orange-500 font-semibold">stg</code> no va a llegar
-          a <code className="text-error font-semibold">main</code> en el release actual, hay dos estrategias:
-        </p>
+      <section id="features-no-release" ref={setRef('features-no-release')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">04</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
+            Features que no llegan a Release
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">
+            Si un feature que ya está en <code className="text-orange-500 font-semibold">stg</code> no va a llegar
+            a <code className="text-error font-semibold">main</code> en el release actual, hay dos estrategias:
+          </p>
+        </div>
 
-        <div className="grid gap-4 mb-6">
+        <div ref={addFadeRef} className="fade-section grid md:grid-cols-2 gap-3 mb-6">
           {/* Option A: Rollback */}
-          <div className="border border-primary/30 rounded-lg bg-primary/5 p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+          <div className="gradient-border p-5 transition-all duration-300 hover:shadow-[0_0_30px_-10px_rgba(0,112,243,0.15)]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(0,112,243,0.1)' }}>
                 <RotateCcw className="w-4 h-4 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Opción A: Rollback en stg</h3>
+              <div>
+                <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">Opción A</span>
+                <h3 className="text-sm font-semibold text-foreground leading-tight">Rollback en stg</h3>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground/80 mb-3 leading-relaxed">
               Revertir los commits del feature en stg antes del squash merge a main.
             </p>
-            <ul className="space-y-1.5 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
                 <span>Útil cuando el feature tiene problemas de calidad o se decidió postergarlo</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
+              </div>
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
                 <span>El feature branch original se preserva para retomarlo en un sprint futuro</span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
 
           {/* Option B: Feature Flag */}
-          <div className="border border-purple-500/30 rounded-lg bg-purple-500/5 p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+          <div className="gradient-border p-5 transition-all duration-300 hover:shadow-[0_0_30px_-10px_rgba(168,85,247,0.15)]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(168,85,247,0.1)' }}>
                 <Flag className="w-4 h-4 text-purple-500" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Opción B: Feature Flag</h3>
+              <div>
+                <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">Opción B</span>
+                <h3 className="text-sm font-semibold text-foreground leading-tight">Feature Flag</h3>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground/80 mb-3 leading-relaxed">
               El feature se despliega a producción pero deshabilitado mediante un feature flag.
             </p>
-            <ul className="space-y-1.5 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
                 <span>Útil cuando el código ya está integrado con otros features y un rollback sería complejo</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-success mt-0.5" />
+              </div>
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
                 <span>Permite activarlo gradualmente cuando esté listo sin necesidad de un nuevo deploy</span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Decision Criteria */}
-        <div className="border border-border rounded-lg bg-muted/30 p-4">
-          <div className="flex items-start gap-3">
+        <div ref={addFadeRef} className="fade-section relative rounded-xl overflow-hidden" style={{ background: 'rgba(0,112,243,0.03)', border: '1px solid rgba(0,112,243,0.08)' }}>
+          <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: '#0070f3' }} />
+          <div className="flex items-start gap-3 p-4 pl-5">
             <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-foreground mb-2">Criterio de Decisión</h4>
-              <p className="text-sm text-muted-foreground">
+              <h4 className="text-sm font-medium text-foreground mb-1">Criterio de Decisión</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Si el feature es aislado y fácil de revertir → <strong className="text-primary">rollback</strong>.
                 Si está entrelazado con otros cambios o casi listo → <strong className="text-purple-500">feature flag</strong>.
               </p>
@@ -346,11 +405,18 @@ git checkout -b feature/nombre-descriptivo`}</code>
       </section>
 
       {/* ===================== RELEASE DAY ===================== */}
-      <section id="release-day" ref={setRef('release-day')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Día de Release</h2>
+      <section id="release-day" ref={setRef('release-day')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">05</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-4 tracking-tight">
+            Día de Release
+          </h2>
+        </div>
 
-        <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">Paso 1: Squash Merge de stg a main</h3>
-        <p className="text-muted-foreground leading-relaxed mb-5">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mt-8 mb-3">
+          Paso 1 — Squash Merge de stg a main
+        </h3>
+        <p className="text-muted-foreground leading-relaxed mb-5 max-w-2xl">
           Todos los commits del sprint se combinan en un único commit limpio en main.
         </p>
 
@@ -371,45 +437,40 @@ git checkout -b feature/nombre-descriptivo`}</code>
           height={220}
         />
 
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 my-5">
-          <h4 className="text-sm font-semibold text-primary mb-3">¿Por qué Squash?</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-primary mt-0.5" />
-              <span>Historial limpio y lineal en main</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <RotateCcw className="w-4 h-4 text-primary mt-0.5" />
-              <span>Fácil revertir sprints completos si es necesario</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <GitMerge className="w-4 h-4 text-primary mt-0.5" />
-              <span>Hitos de release claros</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="w-4 h-4 text-primary mt-0.5" />
-              <span>Auditoría simplificada</span>
-            </li>
-          </ul>
+        {/* Why Squash */}
+        <div ref={addFadeRef} className="fade-section gradient-border p-5 my-6">
+          <h4 className="text-sm font-medium text-primary mb-3">¿Por qué Squash?</h4>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[
+              { icon: CheckCircle, text: 'Historial limpio y lineal en main' },
+              { icon: RotateCcw, text: 'Fácil revertir sprints completos' },
+              { icon: GitMerge, text: 'Hitos de release claros' },
+              { icon: ShieldCheck, text: 'Auditoría simplificada' },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                  <Icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span>{item.text}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">Paso 2: Merge main de vuelta a stg y dev</h3>
-        <p className="text-muted-foreground leading-relaxed mb-4">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mt-10 mb-3">
+          Paso 2 — Merge main de vuelta a stg y dev
+        </h3>
+        <p className="text-muted-foreground leading-relaxed mb-4 max-w-2xl">
           Este paso es <strong className="text-error">CRÍTICO</strong>.
           Después del squash merge, main se debe mergear de vuelta a <strong className="text-foreground">ambos</strong>{' '}
           <code className="text-orange-500 font-semibold">stg</code> y{' '}
           <code className="text-primary font-semibold">dev</code>.
         </p>
 
-        <pre className="bg-card border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto my-6">
-          <code className="text-foreground">{`git checkout stg
-git merge main
-git push origin stg
-
-git checkout dev
-git merge main
-git push origin dev`}</code>
-        </pre>
+        <div ref={addFadeRef} className="fade-section my-6">
+          <TerminalBlock code={`git checkout stg\ngit merge main\ngit push origin stg\n\ngit checkout dev\ngit merge main\ngit push origin dev`} />
+        </div>
 
         <GitDiagram
           commits={[
@@ -429,33 +490,44 @@ git push origin dev`}</code>
           height={280}
         />
 
-        <div className="bg-success/5 border border-success/20 rounded-lg p-5 my-5">
-          <h4 className="text-sm font-semibold text-success mb-3">Resultado</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-success mt-0.5" />
-              <span><code className="text-error">main</code>: 1 commit squasheado</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-success mt-0.5" />
-              <span><code className="text-orange-500">stg</code> y <code className="text-primary">dev</code>: sincronizados con main</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Check className="w-4 h-4 text-success mt-0.5" />
-              <span>
-                <strong className="text-success">Todo listo para el próximo sprint sin conflictos</strong>
-              </span>
-            </li>
-          </ul>
+        {/* Result */}
+        <div ref={addFadeRef} className="fade-section relative rounded-xl overflow-hidden mt-6" style={{ background: 'rgba(13,222,106,0.03)', border: '1px solid rgba(13,222,106,0.1)' }}>
+          <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: '#0dde6a' }} />
+          <div className="p-5 pl-5">
+            <h4 className="text-sm font-medium text-success mb-3">Resultado</h4>
+            <div className="space-y-2.5">
+              <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+                <span><code className="text-error">main</code>: 1 commit squasheado</span>
+              </div>
+              <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+                <span><code className="text-orange-500">stg</code> y <code className="text-primary">dev</code>: sincronizados con main</span>
+              </div>
+              <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+                <span>
+                  <strong className="text-success">Todo listo para el próximo sprint sin conflictos</strong>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ===================== SPRINT 2 ===================== */}
-      <section id="sprint-2" ref={setRef('sprint-2')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Sprint 2</h2>
+      <section id="sprint-2" ref={setRef('sprint-2')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">06</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
+            Sprint 2
+          </h2>
+        </div>
 
-        <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">Comenzando de Nuevo</h3>
-        <p className="text-muted-foreground leading-relaxed mb-5">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mt-8 mb-3">
+          Comenzando de Nuevo
+        </h3>
+        <p className="text-muted-foreground leading-relaxed mb-5 max-w-2xl">
           Con <code className="text-orange-500 font-semibold">stg</code> y{' '}
           <code className="text-primary font-semibold">dev</code> sincronizados con{' '}
           <code className="text-error font-semibold">main</code>, el Sprint 2 comienza limpio.
@@ -484,41 +556,43 @@ git push origin dev`}</code>
           height={400}
         />
 
-        <div className="bg-success/5 border border-success/20 rounded-lg p-5 my-5">
-          <h4 className="text-sm font-semibold text-success mb-2">Sin Conflictos</h4>
-          <p className="text-sm text-muted-foreground">
-            Porque mergeamos main de vuelta a stg y dev, todas las nuevas ramas de features comienzan desde un estado limpio
-            sin conflictos de merge o commits duplicados.
-          </p>
+        <div ref={addFadeRef} className="fade-section relative rounded-xl overflow-hidden mt-6" style={{ background: 'rgba(13,222,106,0.03)', border: '1px solid rgba(13,222,106,0.1)' }}>
+          <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: '#0dde6a' }} />
+          <div className="p-5 pl-5">
+            <h4 className="text-sm font-medium text-success mb-1">Sin Conflictos</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Porque mergeamos main de vuelta a stg y dev, todas las nuevas ramas de features comienzan desde un estado limpio
+              sin conflictos de merge o commits duplicados.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* ===================== BEST PRACTICES ===================== */}
-      <section id="best-practices" ref={setRef('best-practices')} className="scroll-mt-24 mt-16">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Mejores Prácticas</h2>
+      <section id="best-practices" ref={setRef('best-practices')} className="scroll-mt-24 pt-16 section-divider">
+        <div className="section-header">
+          <span className="section-number">07</span>
+          <h2 className="text-2xl font-semibold text-foreground mb-6 tracking-tight">
+            Mejores Prácticas
+          </h2>
+        </div>
 
-        <ul className="space-y-3 text-muted-foreground">
-          <li className="flex items-start gap-3">
-            <span className="text-primary mt-1">•</span>
-            <span>Siempre mergear main de vuelta a stg y dev después del release</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="text-primary mt-1">•</span>
-            <span>Mantener duraciones de sprint consistentes</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="text-primary mt-1">•</span>
-            <span>Testear exhaustivamente en stg antes de liberar</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="text-primary mt-1">•</span>
-            <span>Documentar notas de release con cada commit squash</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="text-primary mt-1">•</span>
-            <span>Etiquetar releases en main para fácil referencia</span>
-          </li>
-        </ul>
+        <div ref={addFadeRef} className="fade-section space-y-2">
+          {[
+            'Siempre mergear main de vuelta a stg y dev después del release',
+            'Mantener duraciones de sprint consistentes',
+            'Testear exhaustivamente en stg antes de liberar',
+            'Documentar notas de release con cada commit squash',
+            'Etiquetar releases en main para fácil referencia',
+          ].map((practice, idx) => (
+            <div key={idx} className="flex items-start gap-3 gradient-border p-3.5">
+              <span className="w-5 h-5 rounded-md bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-[10px] font-mono text-muted-foreground">{idx + 1}</span>
+              </span>
+              <span className="text-sm text-muted-foreground leading-relaxed">{practice}</span>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

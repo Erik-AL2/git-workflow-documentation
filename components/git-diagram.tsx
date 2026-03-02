@@ -20,7 +20,7 @@ interface Branch {
 interface GitDiagramProps {
   commits: CommitNode[];
   branches: Branch[];
-  connections?: { from: string; to: string; type?: 'normal' | 'merge' }[];
+  connections?: { from: string; to: string; type?: 'normal' | 'merge' | 'squash' }[];
   height?: number;
 }
 
@@ -83,7 +83,8 @@ export function GitDiagram({ commits, branches, connections = [], height = 400 }
             const toCommit = commits.find(c => c.id === conn.to);
             if (!fromCommit || !toCommit) return null;
 
-            const isMerge = conn.type === 'merge';
+            const isMerge = conn.type === 'merge' || conn.type === 'squash';
+            const label = conn.type === 'squash' ? 'squash' : conn.type === 'merge' ? 'merge' : null;
             const color = branchColors[toCommit.branch] || '#888';
 
             return (
@@ -91,22 +92,37 @@ export function GitDiagram({ commits, branches, connections = [], height = 400 }
                 <path
                   d={`M ${fromCommit.x} ${fromCommit.y} Q ${(fromCommit.x + toCommit.x) / 2} ${(fromCommit.y + toCommit.y) / 2}, ${toCommit.x} ${toCommit.y}`}
                   stroke={color}
-                  strokeWidth={isMerge ? "2" : "2"}
+                  strokeWidth="2"
                   fill="none"
                   opacity="0.6"
                   markerEnd="url(#arrowhead)"
                 />
-                {isMerge && (
-                  <text
-                    x={(fromCommit.x + toCommit.x) / 2}
-                    y={(fromCommit.y + toCommit.y) / 2 - 10}
-                    className="text-[10px] font-mono"
-                    fill={color}
-                    opacity="0.7"
-                  >
-                    merge
-                  </text>
-                )}
+                {label && (() => {
+                  // Calculate midpoint on the quadratic Bézier curve (t=0.5)
+                  const cx = (fromCommit.x + toCommit.x) / 2;
+                  const cy = (fromCommit.y + toCommit.y) / 2;
+                  const mx = 0.25 * fromCommit.x + 0.5 * cx + 0.25 * toCommit.x;
+                  const my = 0.25 * fromCommit.y + 0.5 * cy + 0.25 * toCommit.y;
+                  // Calculate angle for rotation
+                  const dx = toCommit.x - fromCommit.x;
+                  const dy = toCommit.y - fromCommit.y;
+                  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                  return (
+                    <text
+                      x={mx}
+                      y={my}
+                      className="text-[8px] font-mono"
+                      fill={color}
+                      opacity="0.6"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      transform={`rotate(${angle}, ${mx}, ${my})`}
+                      dy="-6"
+                    >
+                      {label}
+                    </text>
+                  );
+                })()}
               </g>
             );
           })}

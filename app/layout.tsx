@@ -14,8 +14,21 @@ const _instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: 'Git Workflow Docs - Interactive Documentation Platform',
-  description: 'Professional documentation platform for Git workflows with interactive diagrams',
+  title: 'Squash Merge & Release Cycle — Git Workflow Docs',
+  description: 'Documentación interactiva del workflow Squash Merge & Release Cycle. Sprint-based development con 3 branches (main, stg, dev), squash merges a producción y diagramas de git.',
+  metadataBase: new URL('https://git-workflow-documentation.vercel.app'),
+  openGraph: {
+    title: 'Squash Merge & Release Cycle',
+    description: 'Workflow basado en sprints con squash merges a main. 3 branches: main, stg y dev. Documentación interactiva con diagramas de git.',
+    type: 'website',
+    locale: 'es_LA',
+    siteName: 'Git Workflow Docs',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Squash Merge & Release Cycle',
+    description: 'Workflow basado en sprints con squash merges a main. Documentación interactiva con diagramas de git.',
+  },
   icons: {
     icon: [
       {

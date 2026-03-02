@@ -27,7 +27,8 @@ export function getBranchColor(branchName: string): string {
   if (normalized.startsWith('feature/') || normalized.startsWith('feature-')) {
     return BRANCH_COLORS.feature;
   }
-  if (normalized.startsWith('work/') || normalized.startsWith('work-')) {
+  if (normalized.startsWith('work/') || normalized.startsWith('work-') ||
+      normalized.startsWith('resolve/') || normalized.startsWith('resolve-')) {
     return BRANCH_COLORS.work;
   }
 
@@ -61,7 +62,8 @@ export function getBranchColorHex(branchName: string): string {
   if (normalized.startsWith('feature/') || normalized.startsWith('feature-')) {
     return BRANCH_COLORS_HEX.feature;
   }
-  if (normalized.startsWith('work/') || normalized.startsWith('work-')) {
+  if (normalized.startsWith('work/') || normalized.startsWith('work-') ||
+      normalized.startsWith('resolve/') || normalized.startsWith('resolve-')) {
     return BRANCH_COLORS_HEX.work;
   }
 
